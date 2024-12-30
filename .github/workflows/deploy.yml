@@ -1,0 +1,81 @@
+name: Deploy to Linux Server
+
+on:
+  push:
+    # paths:
+    #     - 'InventoryAPI/**'
+    #     - ".github/**"
+    branches:
+      - main
+
+jobs:
+  build-and-deploy-API:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x' # Adjust according to your version
+
+    - name: Publish .NET Project
+      run: dotnet publish InventoryAPI/InventoryAPI.csproj -c Release -o api-publish
+
+
+   
+    - name: Deploy to Server
+      env:
+        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        echo "${SSH_KEY}" > private_key
+        chmod 600 private_key
+        
+        # Add the private key to the SSH agent
+        eval $(ssh-agent -s)
+        ssh-add private_key
+        
+        # Remove old files on the server
+        #ssh -o StrictHostKeyChecking=no root@85.215.74.210 "sudo rm -r /var/www/publish"
+        
+        # Copy files to the server
+        scp -o StrictHostKeyChecking=no -r api-publish/* root@85.215.74.210:/var/www/publish
+        
+        # Restart service
+        ssh -o StrictHostKeyChecking=no root@85.215.74.210 "sudo systemctl restart WebCardAPI"
+        
+        sleep 5  # Give the service a moment to start
+        ssh -o StrictHostKeyChecking=no root@85.215.74.210 "systemctl is-active --quiet WebCardAPI && echo "Service started successfully" || exit 1"
+        ssh -o StrictHostKeyChecking=no root@85.215.74.210 "curl -f http://localhost:5000/health/health || exit 1"
+
+  deploy-blazor:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up .NET
+      - name: Set up .NET Core SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0 # Use your .NET version
+
+      # Step 3: Build the Blazor WebAssembly app
+      - name: Build Blazor WebAssembly app
+        run: |
+          dotnet publish InventoryStorer/InventoryStorer.csproj -c Release -o client-build
+
+      # Step 4: Install Firebase CLI
+      - name: Install Firebase CLI
+        run: |
+          npm install -g firebase-tools
+
+      # Step 5: Deploy to Firebase Hosting
+      - name: Deploy to Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase deploy --only hosting --public client-build/wwwroot

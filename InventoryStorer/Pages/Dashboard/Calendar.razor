@@ -1,0 +1,137 @@
+﻿@page "/Calendar"
+@inject DialogService DialogService
+@using Logic.Shared;
+<RadzenStack Orientation="Orientation.Horizontal">
+    <NavigationBar></NavigationBar>
+    <RadzenCard Style="width:95vw;  height:auto; margin-top:2.5vh; margin-bottom:2.5vh;" class="rz-shadow-6">
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">Calendar</RadzenText>
+            <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px; width: 100%; margin-bottom:20px;" TItem="Appointment" Data=@Logic.Root.appointments StartProperty="_start" EndProperty="_end"
+                             TextProperty="Text" SelectedIndex="2" NextText="Next" TodayText="Today" PrevText="Back"
+                             SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
+                             AppointmentMove=@OnAppointmentMove>
+                <RadzenDayView Text="Day" />
+                <RadzenWeekView Text="Week" />
+                <RadzenMonthView Text="Month" />
+                <RadzenYearView Text="Year"></RadzenYearView>
+            </RadzenScheduler>
+
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+    /// <summary>
+    /// Die Scheduler-Komponente, die die Verwaltung und Anzeige von Terminen ermöglicht.
+    /// </summary>
+    private RadzenScheduler<Appointment> scheduler;
+
+    /// <summary>
+    /// Ein Wörterbuch, das bestimmte Ereignisse nach Datum speichert.
+    /// </summary>
+    private Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    /// <summary>
+    /// Wird aufgerufen, wenn ein Slot im Scheduler gerendert wird.
+    /// Ermöglicht die Anpassung des Erscheinungsbilds bestimmter Zeitslots, wie z. B. das Hervorheben von Arbeitszeiten oder dem aktuellen Datum.
+    /// </summary>
+    /// <param name="args">Die Argumente für das Slot-Render-Ereignis.</param>
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        // Markiere den heutigen Tag in der Monatsansicht
+        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
+        {
+            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+        }
+
+        // Markiere Arbeitszeiten (9-18 Uhr) in der Wochen- und Tagesansicht
+        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+        }
+    }
+
+    /// <summary>
+    /// Wird ausgelöst, wenn ein Zeitslot im Scheduler ausgewählt wird.
+    /// Öffnet einen Dialog, um einen neuen Termin für den ausgewählten Zeitraum hinzuzufügen.
+    /// </summary>
+    /// <param name="args">Die Argumente für das Slot-Select-Ereignis.</param>
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        if (args.View.Text != "Year")
+        {
+            Appointment data = await DialogService.OpenAsync<Dialogs.AddAppointmentDialog>(
+                "Add Item",
+                new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+
+            if (data != null)
+            {
+                Logic.Root.appointments.Add(data);
+                await scheduler.Reload();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Wird ausgelöst, wenn ein Termin im Scheduler ausgewählt wird.
+    /// Öffnet einen Dialog, um den ausgewählten Termin zu bearbeiten.
+    /// </summary>
+    /// <param name="args">Die Argumente für das Appointment-Select-Ereignis.</param>
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    {
+        var copy = new Appointment
+            {
+                start = args.Data.start,
+                _start = args.Data._start,
+                end = args.Data.end,
+                _end = args.Data._end,
+                text = args.Data.text,
+                id = args.Data.id
+            };
+
+        var data = await DialogService.OpenAsync<Dialogs.EditAppointmentDialog>(
+            "Edit Item",
+            new Dictionary<string, object> { { "_appointment", copy } });
+
+        if (data != null)
+        {
+            args.Data.start = data.start;
+            args.Data._start = data._start;
+            args.Data.end = data.end;
+            args.Data._end = data._end;
+            args.Data.text = data.text;
+            args.Data.id = data.id;
+        }
+
+        await scheduler.Reload();
+    }
+
+    /// <summary>
+    /// Wird ausgelöst, wenn ein Termin im Scheduler gerendert wird.
+    /// Ermöglicht die Anpassung des Erscheinungsbilds eines Termins.
+    /// </summary>
+    /// <param name="args">Die Argumente für das Appointment-Render-Ereignis.</param>
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
+    {
+        // Keine Änderungen erforderlich, um Endlosschleifen zu vermeiden
+    }
+
+    /// <summary>
+    /// Wird ausgelöst, wenn ein Termin im Scheduler verschoben wird.
+    /// Aktualisiert die Start- und Endzeit des verschobenen Termins.
+    /// </summary>
+    /// <param name="args">Die Argumente für das Appointment-Move-Ereignis.</param>
+    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+        var draggedAppointment = Logic.Root.appointments.FirstOrDefault(x => x == args.Appointment.Data);
+
+        if (draggedAppointment != null)
+        {
+            draggedAppointment._start += args.TimeSpan;
+            draggedAppointment._end += args.TimeSpan;
+
+            await scheduler.Reload();
+        }
+    }
+}

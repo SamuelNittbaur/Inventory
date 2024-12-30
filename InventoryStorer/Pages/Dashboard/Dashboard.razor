@@ -1,0 +1,492 @@
+﻿@page "/Dashboard"
+@using System.Globalization
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <NavigationBar></NavigationBar>
+    <RadzenCard Style="width:95vw;  height:auto; margin-top:2.5vh; margin-bottom:2.5vh;max-width:95vw;overflow:scroll;" class="rz-shadow-6">
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">Dashboard</RadzenText>
+
+            <RadzenCard Style="height:auto; width:90%; margin-left:%; min-width:900px;" class="rz-shadow-3">
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenStack Style="width:98%;">
+                        <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Inventory Quantity</RadzenText>
+                        <RadzenChart @ref="quantityChart" ColorScheme="ColorScheme.Palette">
+                            <RadzenStackedAreaSeries Smooth="true" Data="@inventoryQuantity" CategoryProperty="Quarter" Title="@(DateTime.Now.Year.ToString())" ValueProperty="Revenue">
+                                <RadzenSeriesDataLabels Visible="false" />
+                            </RadzenStackedAreaSeries>
+                            @*  <RadzenStackedAreaSeries Smooth="true" Data="@inventoryQuantityLastYear" CategoryProperty="Quarter" Title="@((DateTime.Now.Year-1).ToString())" ValueProperty="Revenue">
+                            <RadzenSeriesDataLabels Visible="false" />
+                            </RadzenStackedAreaSeries> *@
+                            <RadzenCategoryAxis Padding="20" />
+                            <RadzenValueAxis>
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle Text="Change" />
+                            </RadzenValueAxis>
+                        </RadzenChart>
+                    </RadzenStack>
+                    <RadzenStack Style="width:98%;">
+                        <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Inventory Bookings</RadzenText>
+                        <RadzenChart @ref="bookingsChart" ColorScheme="ColorScheme.Divergent">
+                            <RadzenColumnSeries Data="@inventoryBookings" CategoryProperty="Quarter" Title="@(DateTime.Now.Year.ToString())" LineType="LineType.Dashed" ValueProperty="Revenue">
+                                <RadzenSeriesDataLabels Visible="false" />
+                            </RadzenColumnSeries>
+                            <RadzenColumnSeries Data="@inventoryBookingsLastYear" CategoryProperty="Quarter" Title="@((DateTime.Now.Year-1).ToString())" LineType="LineType.Dashed" ValueProperty="Revenue">
+                                <RadzenSeriesDataLabels Visible="false" />
+                            </RadzenColumnSeries>
+                            <RadzenColumnOptions Radius="5" />
+                            <RadzenValueAxis>
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle />
+                            </RadzenValueAxis>
+                            <RadzenLegend>
+
+                            </RadzenLegend>
+                        </RadzenChart>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenCard class="rz-shadow-3">
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Inventoryquantity</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">@GetInventoryQuantity()</RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+                <RadzenCard class="rz-shadow-3">
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Bookings this Month</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">@GetInventoryBookingsThisMonth()</RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+                <RadzenCard class="rz-shadow-3">
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Total Value</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">@GetInventoryValue().ToString("N2") €</RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenStack>
+
+            @* <RadzenCard class="rz-shadow-3">
+                <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Notifications</RadzenText>
+                <div style="width:90%; height:40vh; overflow-y:scroll;">
+                    <RadzenStack Gap="10px">
+                        @foreach (var _item in Logic.Root.inventory.FindAll(_inventory => _inventory.quantity == 0))
+                        {
+                            <RadzenAlert style="margin:0px;" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                @($"{_item.name} is empty")
+                            </RadzenAlert>
+                        }
+
+                        @foreach (var _item in Logic.Root.inventory.FindAll(_inventory => _inventory.quantity < _inventory.shouldQuantity))
+                        {
+                            <RadzenAlert style="margin:0px;" AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                @($"{_item.name}'s quantity is below the Should limit")
+                            </RadzenAlert>
+                        }
+                        <RadzenAlert style="margin:0px;" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            Notification: xyz
+                        </RadzenAlert>
+                    </RadzenStack>
+                </div>
+            </RadzenCard> *@
+
+            <RadzenCard Style="height:auto; width:90%; margin-left:%; min-width:900px;" class="rz-shadow-3">
+                <RadzenStack Style="width:90%;">
+                    <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Inventoryvalue</RadzenText>
+                    <RadzenChart @ref="valueChart" ColorScheme="ColorScheme.Monochrome">
+                        <RadzenStackedAreaSeries Smooth="true" Data="@inventoryValue" CategoryProperty="Quarter" Title="@(DateTime.Now.Year.ToString())" ValueProperty="Revenue">
+                            <RadzenSeriesDataLabels Visible="false" />
+                        </RadzenStackedAreaSeries>
+                        @* <RadzenStackedAreaSeries Smooth="true" Data="@inventoryValueLastYear" CategoryProperty="Quarter" Title="@((DateTime.Now.Year-1).ToString())" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="false" />
+                        </RadzenStackedAreaSeries> *@
+                        <RadzenCategoryAxis Padding="20" />
+                        <RadzenValueAxis Formatter="FormatAsEUR">
+                            <RadzenGridLines Visible="true" />
+                            <RadzenAxisTitle Text="Value" />
+                        </RadzenValueAxis>
+                    </RadzenChart>
+                    <RadzenStack Style="width:100%;">
+                        <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-text-tertiary-color);">Inventorycategories</RadzenText>
+                        <RadzenChart ColorScheme="ColorScheme.Monochrome" Style="width:50%;">
+                            <RadzenPieSeries Data="@categoryCount" Title="Categories" CategoryProperty="Quarter" ValueProperty="Revenue">
+                                <RadzenSeriesDataLabels Visible="@false" />
+                            </RadzenPieSeries>
+                        </RadzenChart>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
+    }
+
+
+    /// <summary>
+    /// Repräsentiert eine Sammlung von Datenobjekten für die Kategorieanzahl.
+    /// </summary>
+    List<DataItem> categoryCount = new List<DataItem>();
+
+    /// <summary>
+    /// Repräsentiert die Inventarmenge.
+    /// </summary>
+    List<DataItem> inventoryQuantity = new List<DataItem>();
+
+    /// <summary>
+    /// Repräsentiert die Inventarmenge vom letzten Jahr.
+    /// </summary>
+    List<DataItem> inventoryQuantityLastYear = new List<DataItem>();
+
+    /// <summary>
+    /// Repräsentiert die Buchungen des Inventars.
+    /// </summary>
+    List<DataItem> inventoryBookings = new List<DataItem>();
+
+    /// <summary>
+    /// Repräsentiert die Buchungen des Inventars vom letzten Jahr.
+    /// </summary>
+    List<DataItem> inventoryBookingsLastYear = new List<DataItem>();
+
+    /// <summary>
+    /// Repräsentiert den Inventarwert.
+    /// </summary>
+    List<DataItem> inventoryValue = new List<DataItem>();
+
+    /// <summary>
+    /// Repräsentiert den Inventarwert vom letzten Jahr.
+    /// </summary>
+    List<DataItem> inventoryValueLastYear = new List<DataItem>();
+
+    /// <summary>
+    /// Ein Diagramm zur Darstellung der Inventarmenge.
+    /// </summary>
+    RadzenChart quantityChart = new Radzen.Blazor.RadzenChart();
+
+    /// <summary>
+    /// Ein Diagramm zur Darstellung der Inventarbuchungen.
+    /// </summary>
+    RadzenChart bookingsChart = new Radzen.Blazor.RadzenChart();
+
+    /// <summary>
+    /// Ein Diagramm zur Darstellung des Inventarwertes.
+    /// </summary>
+    RadzenChart valueChart = new Radzen.Blazor.RadzenChart();
+
+    /// <summary>
+    /// Instanz eines Zufallsgenerators.
+    /// </summary>
+    Random rnd = new Random();
+
+    /// <summary>
+    /// Eine Liste, die fehlende Ursachen enthält.
+    /// </summary>
+    List<DataItem> missingCauses = new List<DataItem>();
+
+    /// <summary>
+    /// Initialisiert die Komponente und lädt die Inventar- und Termin-Daten.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        // Lädt die Inventardaten.
+        Logic.Root.inventory = await Logic.InventoryLogic.InventoryLogic.GetInventory(new GeneralRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                userId = Logic.Root.userId,
+                userName = Logic.Root.userName
+            });
+
+        // Lädt die Termindaten.
+        Logic.Root.appointments = await Logic.AppointmentLogic.AppointmentLogic.GetAppointment(new GeneralRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                userId = Logic.Root.userId,
+                userName = Logic.Root.userName
+            });
+
+        double currentValue = GetInventoryQuantity();
+        double currentValuePrice = GetInventoryValue();
+
+        List<HistoryItem> histories = new List<HistoryItem>();
+        foreach (var inventory in Logic.Root.inventory)
+        {
+            inventory.history.ForEach(_item => histories.Add(_item));
+        }
+
+        var quantityData = GetInventoryStates(currentValue, histories);
+
+        foreach (var data in quantityData)
+        {
+            inventoryQuantity.Add(new DataItem()
+                {
+                    Quarter = data.Key,
+                    Revenue = data.Value.Item1
+                });
+            inventoryValue.Add(new DataItem()
+                {
+                    Quarter = data.Key,
+                    Revenue = data.Value.Item2
+                });
+        }
+
+        inventoryQuantity.Reverse();
+        inventoryValue.Reverse();
+
+        categoryCount = Logic.Root.inventory
+            .GroupBy(item => item.category)
+            .Select(group => new DataItem
+                {
+                    Quarter = group.Key,
+                    Revenue = group.Count()
+                })
+            .ToList();
+
+        quantityChart.Reload();
+        bookingsChart.Reload();
+        valueChart.Reload();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Ermittelt die Inventarzustände basierend auf dem aktuellen Inventar und den historischen Änderungen.
+    /// </summary>
+    /// <param name="currentInventory">Der aktuelle Inventarstand.</param>
+    /// <param name="changes">Die Liste der historischen Änderungen.</param>
+    /// <returns>Ein Dictionary mit den Inventarzuständen nach Monaten.</returns>
+    public Dictionary<string, (double, double)> GetInventoryStates(double currentInventory, List<HistoryItem> changes)
+    {
+        changes = changes
+            .Where(c => c.date.Year == DateTime.Now.Year)
+            .OrderByDescending(c => c.date)
+            .ToList();
+
+        var inventoryStates = new Dictionary<string, (double, double)>();
+        double inventory = currentInventory;
+
+        for (int month = 12; month >= 1; month--)
+        {
+            double monthChanges = 0;
+            double monthValue = 0;
+
+            foreach (var change in changes)
+            {
+                if (change.date.Month == month)
+                {
+                    double singlePrice = GetSinglePrice(change.productId);
+                    monthChanges += change.quantity;
+                    monthValue += change.quantity * singlePrice;
+                }
+            }
+
+            inventoryStates[GetMonthName(month)] = (inventory, monthValue);
+            inventory -= monthChanges;
+        }
+
+        return inventoryStates;
+    }
+
+    /// <summary>
+    /// Ermittelt den Einzelpreis für ein Produkt basierend auf der Produkt-ID.
+    /// </summary>
+    /// <param name="productId">Die Produkt-ID.</param>
+    /// <returns>Der Einzelpreis des Produkts.</returns>
+    private double GetSinglePrice(Guid productId)
+    {
+        return Logic.Root.inventory.Find(_item => _item.id == productId).singlePrice;
+    }
+
+
+    /// <summary>
+    /// Gibt den Namen eines Monats basierend auf einer ganzzahligen Eingabe zurück.
+    /// </summary>
+    /// <param name="month">Die Nummer des Monats (1-12).</param>
+    /// <returns>Der Name des Monats als String.</returns>
+    public string GetMonthName(int month)
+    {
+        return new DateTime(1, month, 1).ToString("MMMM");
+    }
+
+    /// <summary>
+    /// Berechnet den verbleibenden Bestand eines Inventarartikels für ein bestimmtes Jahr und einen bestimmten Monat.
+    /// </summary>
+    /// <param name="inventory">Das Inventarobjekt.</param>
+    /// <param name="initialInventory">Der anfängliche Bestand.</param>
+    /// <param name="year">Das Jahr für die Berechnung.</param>
+    /// <param name="month">Der Monat für die Berechnung.</param>
+    /// <returns>Der verbleibende Bestand als Double.</returns>
+    public double CalculateRemainingInventory(InventoryItem inventory, double initialInventory, int year, int month)
+    {
+        if (inventory.joinDate.Year >= year && inventory.joinDate.Month > month && false)
+        {
+            return 0;
+        }
+        else
+        {
+            // Sortiert die Änderungen nach Datum absteigend
+            var changes = inventory.history
+                .Where(c => c.date.Year == DateTime.Now.Year) // Nur Änderungen des aktuellen Jahres
+                .OrderByDescending(c => c.date)
+                .ToList();
+
+            double inventoryStates = 0;
+            double inventoryCount = initialInventory;
+
+            var monthChanges = changes
+                .Where(c => c.date.Month == month)
+                .Sum(c => c.quantity);
+
+            return inventoryCount;
+        }
+    }
+
+    /// <summary>
+    /// Berechnet die Anzahl der Buchungen für ein Inventar in einem bestimmten Jahr und Monat.
+    /// </summary>
+    /// <param name="inventory">Das Inventarobjekt.</param>
+    /// <param name="initialInventory">Der anfängliche Bestand.</param>
+    /// <param name="year">Das Jahr für die Berechnung.</param>
+    /// <param name="month">Der Monat für die Berechnung.</param>
+    /// <returns>Die Anzahl der Buchungen als Double.</returns>
+    public double CalculateInventoryBookings(InventoryItem inventory, double initialInventory, int year, int month)
+    {
+        return inventory.history.FindAll(_item => _item.date.Year == year && _item.date.Month == month).Count();
+    }
+
+    /// <summary>
+    /// Berechnet den Wert des Inventars für ein bestimmtes Jahr und einen bestimmten Monat.
+    /// </summary>
+    /// <param name="inventory">Das Inventarobjekt.</param>
+    /// <param name="initialInventory">Der anfängliche Bestand.</param>
+    /// <param name="year">Das Jahr für die Berechnung.</param>
+    /// <param name="month">Der Monat für die Berechnung.</param>
+    /// <returns>Der Wert des verbleibenden Inventars als Double.</returns>
+    public double CalculateInventoryValue(InventoryItem inventory, double initialInventory, int year, int month)
+    {
+        if (inventory.joinDate.Year >= year && inventory.joinDate.Month >= month)
+        {
+            return 0;
+        }
+        else
+        {
+            var filteredActions = inventory.history
+                        .Where(_item => _item.date.Year < year ||
+                                        (_item.date.Year == year && _item.date.Month <= month))
+                        .ToList();
+
+            double totalItemsTaken = filteredActions.Sum(action => action.quantity * inventory.singlePrice);
+
+            double remainingInventory = initialInventory + totalItemsTaken;
+
+            return remainingInventory;
+        }
+    }
+
+    /// <summary>
+    /// Formatiert einen numerischen Wert als Währung im Euro-Format.
+    /// </summary>
+    /// <param name="value">Der zu formatierende Wert.</param>
+    /// <returns>Der formatierte Wert als String.</returns>
+    string FormatAsEUR(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("de-DE"));
+    }
+
+    /// <summary>
+    /// Berechnet die Gesamtsumme der Inventarmengen.
+    /// </summary>
+    /// <returns>Die Gesamtmenge des Inventars als Double.</returns>
+    private double GetInventoryQuantity()
+    {
+        return Logic.Root.inventory.Sum(_item => _item.quantity);
+    }
+
+    /// <summary>
+    /// Berechnet den Gesamtwert des Inventars.
+    /// </summary>
+    /// <returns>Der Gesamtwert des Inventars als Double.</returns>
+    private double GetInventoryValue()
+    {
+        return Logic.Root.inventory.Sum(_item => _item.sum());
+    }
+
+    /// <summary>
+    /// Berechnet die Anzahl der Buchungen für das aktuelle Monat.
+    /// </summary>
+    /// <returns>Die Anzahl der Buchungen als Integer.</returns>
+    private int GetInventoryBookingsThisMonth()
+    {
+        int returnValue = 0;
+        foreach (var _item in Logic.Root.inventory)
+        {
+            foreach (var _history in _item.history.FindAll(_iter => _iter.date.Month == DateTime.Now.Month && _iter.date.Year == DateTime.Now.Year))
+            {
+                returnValue++;
+            }
+        }
+        return returnValue;
+    }
+
+    /// <summary>
+    /// Eine Liste von Farbskalen basierend auf numerischen Bereichen.
+    /// </summary>
+
+    List<SeriesColorRange> fillRange = new List<SeriesColorRange>()
+{
+    new SeriesColorRange() {Min = 0, Max = 10000, Color = "#FFB3BA"},           // Soft Red
+    new SeriesColorRange() {Min = 10000, Max = 20000, Color = "#FFDFBA"},       // Peach
+    new SeriesColorRange() {Min = 20000, Max = 30000, Color = "#FFFFBA"},       // Light Yellow
+    new SeriesColorRange() {Min = 30000, Max = 40000, Color = "#BAFFC9"},       // Mint Green
+    new SeriesColorRange() {Min = 40000, Max = 50000, Color = "#BAE1FF"},       // Baby Blue
+    new SeriesColorRange() {Min = 50000, Max = 60000, Color = "#D6BAFF"},       // Lavender
+    new SeriesColorRange() {Min = 60000, Max = 70000, Color = "#FFBABA"},       // Light Pink
+    new SeriesColorRange() {Min = 70000, Max = 80000, Color = "#FFC8A2"},       // Apricot
+    new SeriesColorRange() {Min = 80000, Max = 90000, Color = "#FFFACD"},       // Lemon Chiffon
+    new SeriesColorRange() {Min = 90000, Max = 100000, Color = "#B0E0E6"},      // Powder Blue
+    new SeriesColorRange() {Min = 100000, Max = 110000, Color = "#C3FDB8"},     // Pale Green
+    new SeriesColorRange() {Min = 110000, Max = 120000, Color = "#FFEBFF"},     // Lilac
+    new SeriesColorRange() {Min = 120000, Max = 130000, Color = "#FFE4E1"},     // Misty Rose
+    new SeriesColorRange() {Min = 130000, Max = 140000, Color = "#FFDAB9"},     // Peach Puff
+    new SeriesColorRange() {Min = 140000, Max = 150000, Color = "#E6E6FA"},     // Lavender Blue
+    new SeriesColorRange() {Min = 150000, Max = 160000, Color = "#FFF0F5"},     // Lavender Blush
+    new SeriesColorRange() {Min = 160000, Max = 170000, Color = "#FAFAD2"},     // Light Goldenrod Yellow
+    new SeriesColorRange() {Min = 170000, Max = 180000, Color = "#F0FFF0"},     // Honeydew
+    new SeriesColorRange() {Min = 180000, Max = 190000, Color = "#FFEFD5"},     // Papaya Whip
+    new SeriesColorRange() {Min = 190000, Max = 200000, Color = "#FFD700"},     // Gold
+    new SeriesColorRange() {Min = 200000, Max = 210000, Color = "#FF69B4"},     // Hot Pink
+    new SeriesColorRange() {Min = 210000, Max = 220000, Color = "#7FFFD4"},     // Aquamarine
+    new SeriesColorRange() {Min = 220000, Max = 230000, Color = "#6495ED"},     // Cornflower Blue
+    new SeriesColorRange() {Min = 230000, Max = 240000, Color = "#87CEFA"},     // Sky Blue
+    new SeriesColorRange() {Min = 240000, Max = 250000, Color = "#4682B4"},
+    new SeriesColorRange() {Min = 250000, Max = 260000, Color = "#FFB3BA"},      // Soft Red
+    new SeriesColorRange() {Min = 260000, Max = 270000, Color = "#FFDFBA"},      // Peach
+    new SeriesColorRange() {Min = 270000, Max = 280000, Color = "#FFFFBA"},      // Light Yellow
+    new SeriesColorRange() {Min = 280000, Max = 290000, Color = "#BAFFC9"},      // Mint Green
+    new SeriesColorRange() {Min = 290000, Max = 300000, Color = "#BAE1FF"},      // Baby Blue
+    new SeriesColorRange() {Min = 300000, Max = 310000, Color = "#D6BAFF"},      // Lavender
+    new SeriesColorRange() {Min = 310000, Max = 320000, Color = "#FFBABA"},      // Light Pink
+    new SeriesColorRange() {Min = 320000, Max = 330000, Color = "#FFC8A2"},      // Apricot
+    new SeriesColorRange() {Min = 330000, Max = 340000, Color = "#FFFACD"},      // Lemon Chiffon
+    new SeriesColorRange() {Min = 340000, Max = 350000, Color = "#B0E0E6"},      // Powder Blue
+    new SeriesColorRange() {Min = 350000, Max = 360000, Color = "#C3FDB8"},      // Pale Green
+    new SeriesColorRange() {Min = 360000, Max = 370000, Color = "#FFEBFF"},      // Lilac
+    new SeriesColorRange() {Min = 370000, Max = 380000, Color = "#FFE4E1"},      // Misty Rose
+    new SeriesColorRange() {Min = 380000, Max = 390000, Color = "#FFDAB9"},      // Peach Puff
+    new SeriesColorRange() {Min = 390000, Max = 400000, Color = "#E6E6FA"},      // Lavender Blue
+    new SeriesColorRange() {Min = 400000, Max = 410000, Color = "#FFF0F5"},      // Lavender Blush
+    new SeriesColorRange() {Min = 410000, Max = 420000, Color = "#FAFAD2"},      // Light Goldenrod Yellow
+    new SeriesColorRange() {Min = 420000, Max = 430000, Color = "#F0FFF0"},      // Honeydew
+    new SeriesColorRange() {Min = 430000, Max = 440000, Color = "#FFEFD5"},      // Papaya Whip
+    new SeriesColorRange() {Min = 440000, Max = 450000, Color = "#FFD700"},      // Gold
+    new SeriesColorRange() {Min = 450000, Max = 460000, Color = "#FF69B4"},      // Hot Pink
+    new SeriesColorRange() {Min = 460000, Max = 470000, Color = "#7FFFD4"},      // Aquamarine
+    new SeriesColorRange() {Min = 470000, Max = 480000, Color = "#6495ED"},      // Cornflower Blue
+    new SeriesColorRange() {Min = 480000, Max = 490000, Color = "#87CEFA"},      // Sky Blue
+    new SeriesColorRange() {Min = 490000, Max = 500000, Color = "#4682B4"}
+};
+}

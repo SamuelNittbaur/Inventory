@@ -1,0 +1,361 @@
+﻿@page "/dialogcard/{inventory.id}"
+
+@inject Radzen.DialogService dialogService
+@using System.Globalization;
+@inject NavigationManager Navigation
+
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+    <RadzenStack>
+        <RadzenStack>
+            <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="4vw">
+                    @* <RadzenImage Path="https://d287n5ui1wlkai.cloudfront.net/media/_processed_/2/6/csm_38849_d9dfd95c29.png" Style="width: 80px; height: 80px; border-radius: 50%" /> *@
+                    <RadzenStack Gap="0" class="rz-text-truncate">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Name</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.name)</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-4 rz-mb-0" Style="color: var(--rz-text-tertiary-color);">Status</RadzenText>
+                        @if (inventory.status == Status.Empty)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Empty" />
+                        }
+                        else if (inventory.status == Status.New)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Dark" Text="New" />
+                        }
+                        else if (inventory.status == Status.Reserverd)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Reserved" />
+                        }
+                        else
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Full" />
+                        }
+                    </RadzenStack>
+                    <RadzenStack Gap="0" class="rz-text-truncate">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Unit</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.unit)</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Active</RadzenText>
+                        @if (inventory.active)
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Active"></RadzenBadge>
+                        }
+                        else
+                        {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Inactive"></RadzenBadge>
+                        }
+                    </RadzenStack>
+                    <RadzenStack Gap="0" class="rz-text-truncate">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Creation Date</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.joinDate.ToString("dd.MM.yyyy"))</b></RadzenText>
+                        @if (Logic.FeatureFlip.insertedFrom)
+                        {
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Created from</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.insertedFrom)</b></RadzenText>
+                        }
+                    </RadzenStack>
+
+                    <RadzenStack Gap="0" class="rz-text-truncate">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Single Price</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.singlePrice.ToString("C", new CultureInfo("de-DE")))</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Sum</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.sum().ToString("C", new CultureInfo("de-DE")))</b></RadzenText>
+                    </RadzenStack>
+
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Quantity Informations</RadzenText>
+                <RadzenStack Gap="0" class="rz-text-truncate">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Quantity</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.quantity)</b></RadzenText>
+
+                </RadzenStack>
+                <RadzenStack Gap="0" class="rz-text-truncate">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Min Quantity</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.minQuantity)</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Should Quantity</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(inventory.shouldQuantity)</b></RadzenText>
+                </RadzenStack>
+            </RadzenColumn>
+
+            <RadzenCard>
+                <RadzenStack>
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Take Item</RadzenText>
+                    @if (inventory.quantity - tempHistoryItem.quantity < 0 && tookItem)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            The Inserted Quantity will set the Quantity lower than 0
+                        </RadzenAlert>
+                    }
+                    @if (inventory.quantity - tempHistoryItem.quantity < inventory.shouldQuantity)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            The Inserted Quantity will set the Quantity lower than the Should Quantity
+                        </RadzenAlert>
+                    }
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End">
+
+                        @if (tookItem)
+                        {
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="-" Style="height:30px; width:30px; max-width:30px;" Click="(() => {tookItem = !tookItem; StateHasChanged();})"></RadzenButton>
+                        }
+                        else
+                        {
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Style="height:30px; width:30px; max-width:30px;" Text="+" Click="(() => {tookItem = !tookItem; StateHasChanged();})"></RadzenButton>
+                        }
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Anzahl</RadzenText>
+                            <RadzenNumeric @bind-Value="tempHistoryItem.quantity" Style="width: 100%" aria-label="TextArea" Disabled="loading" Min="0" />
+                        </div>
+                        <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Enter" Click="TakeItem" Disabled="loading"></RadzenButton>
+                    </RadzenStack>
+                </RadzenStack>
+
+            </RadzenCard>
+
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-m-0">Historische Daten</RadzenText>
+
+            </RadzenStack>
+            <RadzenDataGrid @ref="historyGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            Data="@inventory.history" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(HistoryItem.quantity)" Title="Quantity" Frozen="false" Sortable="true" Filterable="true" Width="100px" />
+                    <RadzenDataGridColumn Title="Name" Frozen="false" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText>@Logic.Root.inventory.Find(_item => _item.id == data.productId).name</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    @if (Logic.FeatureFlip.insertedFrom)
+                    {
+                        <RadzenDataGridColumn Property="@nameof(HistoryItem.insertedFrom)" Title="Changed From" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+                    }
+                    <RadzenDataGridColumn Title="Date" Frozen="false" Sortable="true" Filterable="true" Width="80px" TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText>@data.date.ToString("dd.MM.yyyy HH:mm")</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn Title="Change" Frozen="false" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            @if (data.quantity < 0)
+                            {
+                                <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Took" />
+                            }
+                            else
+                            {
+                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Inserted" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    @if (Logic.FeatureFlip.insertedFrom)
+                    {
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.insertedFrom)" Title="Erstellt von" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+                    }
+                </Columns>
+            </RadzenDataGrid>
+
+            <RadzenChart @ref="historyChart" ColorScheme="ColorScheme.Monochrome">
+                <RadzenStackedAreaSeries Smooth="true" Data="@historyStat" CategoryProperty="Quarter" Title="2024" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="false" />
+                </RadzenStackedAreaSeries>
+                <RadzenCategoryAxis Padding="20" />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Change" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenStack>
+
+    </RadzenStack>
+    <RadzenStack Visible="true" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" Style="margin-bottom:20px;">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1vw">
+            <RadzenButton Click="@((args) => DeleteItem())" Variant="Variant.Filled" ButtonStyle="ButtonStyle.Danger" Icon="delete_forever" Style="margin-bottom:20px;" />
+            <RadzenButton Click="@((args) => {grid.Reload();dialogService.Close(true); })" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Warning" Icon="exit_to_app" Style="margin-bottom:20px;" />
+        </RadzenStack>
+        <RadzenButton Click="EditInventoryItem" Icon="edit" Disabled="false" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Outlined" Style="margin-bottom:20px;"></RadzenButton>
+    </RadzenStack>
+</RadzenStack>
+<div style="height:50px;"></div>
+
+@code {
+    /// <summary>
+    /// Die DataGrid-Komponente, die die Bestandsdaten anzeigt und verwaltet.
+    /// </summary>
+    /// <value>Ein <see cref="RadzenDataGrid{InventoryItem}"/>-Objekt, das für die Bestandsanzeige verwendet wird.</value>
+    [Parameter]
+    public RadzenDataGrid<InventoryItem> grid { get; set; } = new RadzenDataGrid<InventoryItem>();
+
+    /// <summary>
+    /// Das aktuelle Bestandsobjekt, das bearbeitet oder analysiert wird.
+    /// </summary>
+    /// <value>Ein <see cref="InventoryItem"/>-Objekt, das den Bestand repräsentiert.</value>
+    [Parameter]
+    public InventoryItem inventory { get; set; }
+
+    /// <summary>
+    /// Temporäres Historienelement, das für neue Einträge in der Bestandsgeschichte verwendet wird.
+    /// </summary>
+    HistoryItem tempHistoryItem = new HistoryItem();
+
+    /// <summary>
+    /// Gibt an, ob ein Artikel aus dem Bestand entnommen wird.
+    /// </summary>
+    private bool tookItem = true;
+
+    /// <summary>
+    /// Gibt an, ob ein Vorgang aktuell geladen wird.
+    /// </summary>
+    private bool loading = false;
+
+    /// <summary>
+    /// Enthält die berechneten historischen Daten für die Bestandsentwicklung.
+    /// </summary>
+    private List<DataItem> historyStat = new List<DataItem>();
+
+    /// <summary>
+    /// Die Chart-Komponente, die die Bestandsstatistiken visualisiert.
+    /// </summary>
+    RadzenChart historyChart = new Radzen.Blazor.RadzenChart();
+
+    /// <summary>
+    /// Die DataGrid-Komponente, die die Bestandsgeschichte anzeigt.
+    /// </summary>
+    RadzenDataGrid<HistoryItem> historyGrid = new RadzenDataGrid<HistoryItem>();
+
+    /// <summary>
+    /// Klasse für die Darstellung von Datenpunkten in der Bestandsstatistik.
+    /// </summary>
+    class DataItem
+    {
+        /// <summary>
+        /// Der Name des Quartals oder Monats.
+        /// </summary>
+        public string Quarter { get; set; }
+
+        /// <summary>
+        /// Der Umsatz oder der verbleibende Bestand für das jeweilige Quartal oder den Monat.
+        /// </summary>
+        public double Revenue { get; set; }
+    }
+
+    /// <summary>
+    /// Wird bei der Initialisierung der Komponente aufgerufen. Berechnet die Bestandsgeschichte.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        CalculateHistory();
+    }
+
+    /// <summary>
+    /// Markiert den Artikel als gelöscht, aktualisiert die Datenbank und entfernt den Artikel aus der Ansicht.
+    /// </summary>
+    private async void DeleteItem()
+    {
+        inventory.isDeleted = true;
+        var response = await Logic.InventoryLogic.InventoryLogic.InsertNewMaschine(new InventoryRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = inventory
+            });
+        Logic.Root.inventory.RemoveAll(_item => _item.id == inventory.id);
+        grid.Reload();
+        dialogService.Close(true);
+    }
+
+    /// <summary>
+    /// Berechnet die Bestandsentwicklung für das aktuelle Jahr und aktualisiert die Statistik.
+    /// </summary>
+    private void CalculateHistory()
+    {
+        historyStat.Clear();
+        List<HistoryItem> itemsThisYear = inventory.history.FindAll(_item => _item.date.Year == DateTime.Now.Year);
+        double currentValue = inventory.quantity;
+
+        for (int month = 1; month <= 12; month++)
+        {
+            string monthName = new DateTime(2024, month, 1).ToString("MMMM");
+            DataItem item = new DataItem
+                {
+                    Quarter = monthName,
+                    Revenue = CalculateRemainingInventory(currentValue, DateTime.Now.Year, month)
+                };
+            historyStat.Add(item);
+        }
+
+        historyChart.Reload();
+    }
+
+    /// <summary>
+    /// Berechnet den verbleibenden Bestand basierend auf dem initialen Bestand, dem Jahr und dem Monat.
+    /// </summary>
+    /// <param name="initialInventory">Der anfängliche Bestand.</param>
+    /// <param name="year">Das Jahr, für das der Bestand berechnet wird.</param>
+    /// <param name="month">Der Monat, für den der Bestand berechnet wird.</param>
+    /// <returns>Der verbleibende Bestand.</returns>
+    public double CalculateRemainingInventory(double initialInventory, int year, int month)
+    {
+        var filteredActions = inventory.history
+            .Where(_item => _item.date.Year < year ||
+                            (_item.date.Year == year && _item.date.Month <= month))
+            .ToList();
+
+        double totalItemsTaken = filteredActions.Sum(action => action.quantity);
+        double remainingInventory = initialInventory + totalItemsTaken;
+
+        return remainingInventory;
+    }
+
+    /// <summary>
+    /// Leitet die Bearbeitung eines Bestandsartikels ein und navigiert zum Formular zur Bearbeitung.
+    /// </summary>
+    private async void EditInventoryItem()
+    {
+        Logic.Root.itemToEdit = inventory;
+        dialogService.Close();
+        Navigation.NavigateTo("/InventoryForm");
+    }
+
+    /// <summary>
+    /// Fügt ein neues Historienelement hinzu, aktualisiert den Bestand und die Datenbank.
+    /// </summary>
+    private async void TakeItem()
+    {
+        loading = true;
+        StateHasChanged();
+
+        if (tookItem)
+            tempHistoryItem.quantity = -tempHistoryItem.quantity;
+
+        tempHistoryItem.insertedFrom = $"{Logic.Root.userConfiguration.firstName} {Logic.Root.userConfiguration.lastName}";
+        tempHistoryItem.date = DateTime.Now;
+        tempHistoryItem.id = Guid.NewGuid();
+        tempHistoryItem.productId = inventory.id;
+
+        inventory.history.Add(tempHistoryItem);
+        inventory.quantity += tempHistoryItem.quantity;
+
+        var response = await Logic.InventoryLogic.InventoryLogic.InsertNewMaschine(new InventoryRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = inventory
+            });
+
+        try
+        {
+            int index = Logic.Root.inventory.IndexOf(Logic.Root.inventory.Find(_item => _item.id == inventory.id));
+            Logic.Root.inventory[index] = inventory;
+        }
+        catch (Exception exception)
+        {
+            // Fehlerbehandlung hier einfügen
+        }
+
+        tempHistoryItem = new HistoryItem();
+        CalculateHistory();
+        historyGrid.Reload();
+        loading = false;
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,55 @@
+﻿@page "/PaidCheck"
+@inject IJSRuntime jsRuntime
+@inject DialogService DialogService
+@inject NavigationManager Navigation
+
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+    <RadzenCard Style="width:30vw; margin-top:20vh; min-width:350px;" class="rz-shadow-6">
+        <RadzenStack Gap="2vh">
+            <RadzenText TextStyle="TextStyle.H4" Style="color: var(--rz-text-tertiary-color);">Waiting for Payment Answer</RadzenText>
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+                If you're not directed automaticly after payment. please contact info@sn-dev.de
+            </RadzenAlert>
+            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    /// <summary>
+    /// Wird während der Initialisierung der Komponente aufgerufen.
+    /// Startet den Prozess zur Überprüfung der Benutzerkonfiguration.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        CheckIterate();
+    }
+
+    /// <summary>
+    /// Überprüft rekursiv die Benutzerkonfiguration, um festzustellen, ob der Benutzer ein bezahlter Kunde ist.
+    /// Falls bezahlt, wird der Benutzer zur Dashboard-Seite weitergeleitet. Andernfalls wird die Überprüfung nach einer Verzögerung erneut durchgeführt.
+    /// </summary>
+    private async void CheckIterate()
+    {
+        var configuration = await Logic.UserLogic.UserLogic.GetUserConfiguration(new GeneralRequest()
+            {
+                userId = Logic.Root.userConfiguration.id,
+                userName = Logic.Root.userName,
+                company = Logic.Root.userConfiguration.company
+            });
+
+        if (configuration.paid)
+        {
+            // Leitet den Benutzer zum Dashboard weiter, wenn die Zahlung erfolgt ist.
+            Navigation.NavigateTo("/Dashboard");
+        }
+        else
+        {
+            // Wartet 2 Sekunden und überprüft erneut.
+            await Task.Delay(2000);
+            CheckIterate();
+        }
+    }
+
+}

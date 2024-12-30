@@ -1,0 +1,76 @@
+﻿@inject DialogService DialogService
+@using Logic.Shared;
+
+<RadzenTemplateForm TItem="Appointment" Data="@model" Submit=@OnSubmit>
+    <RadzenStack Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Title" Style="width: 6rem;" />
+            <RadzenTextBox @bind-Value="@model.text" Name="Text" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Text" Text="Title is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Start" Style="width: 6rem;" />
+            <RadzenDatePicker @bind-Value="@model._start" Name="Start" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Start" Text="Start is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="End" Style="width: 6rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="@model._end" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="End" Text="End is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton ButtonStyle="ButtonStyle.Warning" Variant="Variant.Outlined" Icon="exit_to_app" Click="(() => {DialogService.Close();})" />
+            <RadzenButton Click="UpdateAppointment" Icon="done" ButtonStyle="ButtonStyle.Success" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+@code {
+    /// <summary>
+    /// Das aktuelle Terminmodell, das als Parameter an die Komponente übergeben wird.
+    /// </summary>
+    /// <value>Ein <see cref="Appointment"/>-Objekt, das den zu bearbeitenden oder anzuzeigenden Termin enthält.</value>
+    [Parameter]
+    public Appointment _appointment { get; set; } = new Appointment();
+
+    /// <summary>
+    /// Lokale Instanz des Terminmodells, die innerhalb der Komponente verwendet wird.
+    /// </summary>
+    Appointment model = new Appointment();
+
+    /// <summary>
+    /// Wird aufgerufen, wenn die Parameter der Komponente gesetzt werden.
+    /// Aktualisiert das lokale Modell mit dem übergebenen Terminmodell.
+    /// </summary>
+    protected override void OnParametersSet()
+    {
+        model = _appointment;
+    }
+
+    /// <summary>
+    /// Wird beim Absenden des Formulars aufgerufen.
+    /// Schließt das Dialogfenster und gibt das aktuelle Terminmodell zurück.
+    /// </summary>
+    /// <param name="model">Das Terminmodell, das übergeben wird.</param>
+    void OnSubmit(Appointment model)
+    {
+        DialogService.Close(model);
+    }
+
+    /// <summary>
+    /// Aktualisiert den Termin, indem ein neuer Eintrag in der Datenbank erstellt wird.
+    /// Sendet die Anfrage an die API mit dem aktuellen Terminmodell.
+    /// </summary>
+    private async void UpdateAppointment()
+    {
+        // Füge einen neuen Termin mithilfe der API hinzu
+        var response = await Logic.AppointmentLogic.AppointmentLogic.InsertNewAppointment(new AppointmentRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = model
+            });
+
+        // Schließe das Dialogfenster mit dem aktualisierten Terminmodell
+        DialogService.Close(model);
+    }
+
+}

@@ -1,0 +1,212 @@
+﻿@page "/"
+@page "/Login"
+
+@inject NavigationManager navManager
+@inject NotificationService NotificationService
+@inject IJSRuntime jsRuntime
+@using System.Globalization;
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+    <RadzenCard Style="width:30vw; margin-top:20vh; min-width:350px;" class="rz-shadow-6">
+        <RadzenStack Gap="2vh">
+            <RadzenText TextStyle="TextStyle.H4" Style="color: var(--rz-text-tertiary-color);">Login</RadzenText>
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Username</RadzenText>
+                <RadzenTextBox @bind-Value="request.userName" Disabled="isLoading" Placeholder="Username..." Style="width: 100%" aria-label="Username Textbox" />
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Password</RadzenText>
+                <RadzenPassword @bind-Value="request.password" Disabled="isLoading" Style="width: 100%" aria-label="Username Textbox" />
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.5vh;">
+                <RadzenButton Click="LoginFunc" class="rz-ripple" Style="margin-bottom:1vh; width:100%;" Disabled="isLoading" ButtonStyle="ButtonStyle.Success">
+                    @if (isLoading)
+                    {
+                        <RadzenProgressBarCircular style="height:20px;" ProgressBarStyle="ProgressBarStyle.Secondary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+
+                    }
+                    else
+                    {
+                        <div>Login</div>
+                    }
+                </RadzenButton>
+                <a href="/Register">
+                    <RadzenButton style="width:100%;" class="rz-ripple" Disabled="isLoading" ButtonStyle="ButtonStyle.Base">New Account</RadzenButton>
+                </a>
+                <a href="/ForgotPassword">
+                    <RadzenButton class="rz-ripple" style="width:100%;" Variant="Variant.Outlined" Disabled="isLoading" ButtonStyle="ButtonStyle.Warning">Forgot Password</RadzenButton>
+                </a>
+            </div>
+
+        </RadzenStack>
+
+
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    /// <summary>
+    /// Indicates whether a loading process is currently active.
+    /// </summary>
+    private bool isLoading = true;
+
+    /// <summary>
+    /// Represents the login request details such as username and password.
+    /// </summary>
+    private LoginRequest request = new LoginRequest();
+
+    /// <summary>
+    /// Initializes the component by checking session data and user authentication.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        // Uncomment to set the API URL for production.
+        //if (!navManager.Uri.Contains("localhost")) Logic.Root.apiURL = "https://webcardapi.online";
+
+        isLoading = false;
+        StateHasChanged();
+        try
+        {
+            // Retrieve session data.
+            var tempId = await Logic.SessionLogic.SessionLogic.GetItem(jsRuntime, "xOne");
+            var tempUserName = await Logic.SessionLogic.SessionLogic.GetItem(jsRuntime, "xTwo");
+            var tempCompany = await Logic.SessionLogic.SessionLogic.GetItem(jsRuntime, "xThree");
+            var tempDate = await Logic.SessionLogic.SessionLogic.GetItem(jsRuntime, "xFour");
+            var lastPage = await Logic.SessionLogic.SessionLogic.GetItem(jsRuntime, "lastPage");
+
+            if (!String.IsNullOrEmpty(tempId))
+            {
+                string format = "dd.MM.yyyy HH:mm:ss";
+                DateTime date = DateTime.ParseExact(tempDate, format, CultureInfo.InvariantCulture);
+                if ((DateTime.Now - date).TotalDays < 1)
+                {
+                    Guid id = Guid.Parse(tempId);
+                    Logic.Root.userId = id;
+
+                    var token = await Logic.UserLogic.UserLogic.GetToken(new GeneralRequest()
+                        {
+                            userId = id,
+                            userName = tempUserName,
+                            company = tempCompany
+                        });
+
+                    if (id != Guid.Empty && !String.IsNullOrEmpty(token))
+                    {
+                        Logic.Root.jwtToken = token;
+                        Logic.Root.userName = tempUserName;
+                        Logic.Root.userId = id;
+
+                        var configuration = await Logic.UserLogic.UserLogic.GetUserConfiguration(new GeneralRequest()
+                            {
+                                userId = Logic.Root.userId,
+                                userName = Logic.Root.userName,
+                                company = Logic.Root.userConfiguration.company
+                            });
+
+                        if (!configuration.paid)
+                            navManager.NavigateTo($"/NotPaid");
+
+                        if (configuration.id != Guid.Empty)
+                        {
+                            Logic.Root.loggedIn = true;
+                            Logic.Root.userConfiguration = configuration;
+
+                            await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xOne", configuration.id.ToString());
+                            await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xTwo", Logic.Root.userName);
+                            await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xThree", Logic.Root.userConfiguration.company);
+                            await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xFour", DateTime.Now.ToString());
+
+                            navManager.NavigateTo($"/{lastPage}");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            // Handle initialization errors.
+        }
+    }
+
+    /// <summary>
+    /// Executes the login functionality, authenticates the user, and navigates to the dashboard if successful.
+    /// </summary>
+    private async void LoginFunc()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        request.userName = request.userName;
+
+        var response = await Logic.UserLogic.UserLogic.Login(request);
+        if (response.userId != Guid.Empty && !String.IsNullOrEmpty(response.jwtToken))
+        {
+            Logic.Root.jwtToken = response.jwtToken;
+            Logic.Root.userName = request.userName;
+            Logic.Root.userId = response.userId;
+
+            var configuration = await Logic.UserLogic.UserLogic.GetUserConfiguration(new GeneralRequest()
+                {
+                    userId = Logic.Root.userId,
+                    userName = Logic.Root.userName,
+                    company = Logic.Root.userConfiguration.company
+                });
+
+            if (!configuration.paid)
+                navManager.NavigateTo($"/NotPaid");
+
+            if (configuration.id != Guid.Empty)
+            {
+                Logic.Root.loggedIn = true;
+                Logic.Root.userConfiguration = configuration;
+
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xOne", configuration.id.ToString());
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xTwo", Logic.Root.userName);
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xThree", Logic.Root.userConfiguration.company);
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xFour", DateTime.Now.ToString());
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "lastPage", "Dashboard");
+                navManager.NavigateTo("/Dashboard");
+            }
+            else
+            {
+                ShowNotification(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "Failed to log you in",
+                        Duration = 4000,
+                        CloseOnClick = true,
+                        Payload = DateTime.Now
+                    });
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Failed to log you in",
+                    Duration = 4000,
+                    CloseOnClick = true,
+                    Payload = DateTime.Now
+                });
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Displays a notification message to the user.
+    /// </summary>
+    /// <param name="message">The notification message to display.</param>
+    private void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+
+}

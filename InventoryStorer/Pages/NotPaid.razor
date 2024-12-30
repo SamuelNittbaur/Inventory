@@ -1,0 +1,16 @@
+﻿@page "/NotPaid"
+@inject IJSRuntime jsRuntime
+@inject DialogService DialogService
+@inject NavigationManager Navigation
+
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+    <RadzenCard Style="width:30vw; margin-top:20vh; min-width:350px;" class="rz-shadow-6">
+        <RadzenStack Gap="2vh">
+            <RadzenText TextStyle="TextStyle.H4" Style="color: var(--rz-text-tertiary-color);">Not Paid</RadzenText>
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+               Looks like something went wrong with your payment process. Please contact info@sn-dev.de
+            </RadzenAlert>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>

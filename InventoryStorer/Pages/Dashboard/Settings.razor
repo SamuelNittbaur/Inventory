@@ -1,0 +1,139 @@
+﻿@page "/Settings"
+@inject NotificationService NotificationService
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <NavigationBar></NavigationBar>
+    <RadzenCard Style="width:95vw;  height:95vh; margin-top:2.5vh;" class="rz-shadow-6">
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">Settings</RadzenText>
+            <RadzenStack Orientation="@(Logic.Root.isMobile ? Orientation.Vertical : Orientation.Horizontal)">
+                <RadzenCard Style="width:30vw; min-width:350px;" class="rz-shadow-6">
+                    <RadzenStack Gap="2vh">
+                        <RadzenText TextStyle="TextStyle.H6" Style="color: var(--rz-text-tertiary-color);">Forgot Password</RadzenText>
+                        <RadzenAlert Title="Info" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            We will send you an email with instructions
+                        </RadzenAlert>
+                        <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Username</RadzenText>
+                            <RadzenTextBox Disabled="isLoading" Placeholder="UserName" @bind-Value="request.userName" Style="width: 100%" aria-label="Username Textbox" />
+                        </div>
+                        <RadzenButton class="rz-ripple" style="width:100%;" Disabled="isLoading" ButtonStyle="ButtonStyle.Success" Icon="done" Click="ForgotPasswortFunc" />
+
+                    </RadzenStack>
+                </RadzenCard>
+                <RadzenCard Style="width:30vw; min-width:350px;" class="rz-shadow-6">
+                    <RadzenStack Gap="2vh">
+                        <RadzenText TextStyle="TextStyle.H6" Style="color: var(--rz-text-tertiary-color);">Cancel Subscription</RadzenText>
+                        <RadzenAlert Title="Info" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            Please send an Email with your username, email and company to <a href="mailto:info@sn-dev.de">info@sn-dev.de</a>
+                            In-Software Cancel will be available soon
+                        </RadzenAlert>
+                    </RadzenStack>
+                </RadzenCard>
+                <RadzenCard Style="width:30vw; min-width:350px;" class="rz-shadow-6">
+                    <RadzenStack Gap="2vh">
+                        <RadzenText TextStyle="TextStyle.H6" Style="color: var(--rz-text-tertiary-color);">Categories</RadzenText>
+                        <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                            <RadzenTextBox Disabled="isLoading" Placeholder="Name of Category" @bind-Value="tempCategory" Style="width: 100%" aria-label="Username Textbox" />
+                        </div>
+                        <RadzenButton Click="SafeCategories" ButtonStyle="ButtonStyle.Success" Variant="Variant.Outlined" Icon="done" Disabled="isLoading"></RadzenButton>
+                        <div style="height:300px; display:flex; flex-direction:column;overflow-y:scroll;">
+                            @foreach (var category in Logic.Root.userConfiguration.categories)
+                            {
+                                <RadzenCard Style="margin:10px;">
+                                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+                                        <RadzenText Style="margin-top:10px;" TextStyle="TextStyle.Body1" TagName="TagName.H3">@category</RadzenText>
+                                        <RadzenButton Icon="remove" Disabled="isLoading" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Outlined" Click="(() => {Logic.Root.userConfiguration.categories.Remove(category); StateHasChanged();})"></RadzenButton>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            }
+                        </div>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+    /// <summary>
+    /// Indicates whether a loading process is currently active.
+    /// </summary>
+    private bool isLoading = false;
+
+    /// <summary>
+    /// A general request object used for various operations.
+    /// </summary>
+    GeneralRequest request = new GeneralRequest();
+
+    /// <summary>
+    /// Temporarily stores the category input from the user.
+    /// </summary>
+    private string tempCategory = String.Empty;
+
+    /// <summary>
+    /// Handles the logic for initiating a password recovery email.
+    /// </summary>
+    private async void ForgotPasswortFunc()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        var response = await Logic.UserLogic.UserLogic.SendPasswordEmail(request);
+        if (response)
+        {
+            ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Success",
+                    Detail = "Please Check your Emails",
+                    Duration = 4000,
+                    CloseOnClick = true,
+                    Payload = DateTime.Now
+                });
+            isLoading = false;
+            StateHasChanged();
+        }
+        else
+        {
+            ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Something went wrong. Please contact info@sn-dev.de",
+                    Duration = 4000,
+                    CloseOnClick = true,
+                    Payload = DateTime.Now
+                });
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Saves the current temporary category to the user configuration.
+    /// </summary>
+    private async void SafeCategories()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        Logic.Root.userConfiguration.categories.Add(tempCategory);
+        var response = await Logic.UserLogic.UserLogic.CreateUserConfiguration(Logic.Root.userConfiguration);
+        tempCategory = String.Empty;
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Displays a notification message to the user.
+    /// </summary>
+    /// <param name="message">The notification message to display.</param>
+    private void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+
+}

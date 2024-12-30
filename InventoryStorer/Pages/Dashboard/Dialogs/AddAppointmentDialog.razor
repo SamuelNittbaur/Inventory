@@ -1,0 +1,87 @@
+﻿@inject DialogService DialogService
+@using Logic.Shared
+
+<RadzenTemplateForm TItem="Appointment" Data="@model" Submit=@OnSubmit>
+    <RadzenStack Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Title" Style="width: 4rem;" />
+            <RadzenTextBox @bind-Value="@model.text" Name="Text" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Text" Text="Title is mandatory" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Start" Style="width: 4rem;" />
+            <RadzenDatePicker @bind-Value="@model._start" Name="Start" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Start" Text="Start is mandatory" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="End" Style="width: 4rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="@model._end" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="End" Text="Ende is mandatory" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton Click="(() => {DialogService.Close();})" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Outlined" Icon="exit_to_app" />
+            <RadzenButton Click="UpdateAppointment" ButtonStyle="ButtonStyle.Success" Icon="done" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+@code {
+    /// <summary>
+    /// Der Startzeitpunkt des Termins.
+    /// </summary>
+    /// <value>Ein DateTime-Wert, der den Startzeitpunkt repräsentiert.</value>
+    [Parameter]
+    public DateTime Start { get; set; }
+
+    /// <summary>
+    /// Der Endzeitpunkt des Termins.
+    /// </summary>
+    /// <value>Ein DateTime-Wert, der den Endzeitpunkt repräsentiert.</value>
+    [Parameter]
+    public DateTime End { get; set; }
+
+    /// <summary>
+    /// Repräsentiert das aktuelle Terminmodell, das bearbeitet oder erstellt wird.
+    /// </summary>
+    Appointment model = new Appointment();
+
+    /// <summary>
+    /// Wird aufgerufen, wenn die Parameter gesetzt werden.
+    /// Initialisiert die Start- und Endzeit des Terminmodells basierend auf den übergebenen Parametern.
+    /// </summary>
+    protected override void OnParametersSet()
+    {
+        model._start = Start;
+        model._end = End;
+    }
+
+    /// <summary>
+    /// Wird beim Absenden des Formulars aufgerufen.
+    /// Schließt das Dialogfenster und gibt das aktuelle Terminmodell zurück.
+    /// </summary>
+    /// <param name="model">Das Terminmodell, das übergeben wird.</param>
+    void OnSubmit(Appointment model)
+    {
+        DialogService.Close(model);
+    }
+
+    /// <summary>
+    /// Aktualisiert den Termin, indem ein neuer Eintrag in der Datenbank erstellt wird.
+    /// Generiert eine eindeutige ID für das Terminmodell und sendet die Anfrage an die API.
+    /// </summary>
+    private async void UpdateAppointment()
+    {
+        // Generiere eine eindeutige ID für den Termin
+        model.id = Guid.NewGuid().ToString();
+
+        // Füge einen neuen Termin mithilfe der API hinzu
+        var response = await Logic.AppointmentLogic.AppointmentLogic.InsertNewAppointment(new AppointmentRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = model
+            });
+
+        // Schließe das Dialogfenster mit dem aktualisierten Terminmodell
+        DialogService.Close(model);
+    }
+
+}

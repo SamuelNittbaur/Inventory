@@ -1,0 +1,223 @@
+﻿@page "/Register"
+@inject NavigationManager navManager
+@inject NotificationService NotificationService
+@inject IJSRuntime jsRuntime
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+    <RadzenCard Style="width:30vw; margin-top:20vh; min-width:350px;" class="rz-shadow-6">
+        <RadzenStack Gap="2vh">
+            <RadzenText TextStyle="TextStyle.H4" Style="color: var(--rz-text-tertiary-color);">Register</RadzenText>
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Username</RadzenText>
+                <RadzenTextBox Disabled="isLoading" Placeholder="Username..." @bind-Value="request.configuration.userName" Style="width: 100%" aria-label="Username Textbox" />
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Password</RadzenText>
+                <RadzenPassword @bind-Value="request.password" Change=@(args => CheckPasswordStrength()) Disabled="isLoading" Style="width: 100%" aria-label="Username Textbox" />
+                <div style="display:flex; flex-direction:row;gap:2.5%; margin-top:5px;">
+                    @for (int i = 0; i <= strengthScore; i++)
+                    {
+                        <div style="background-color:@Logic.UserLogic.UserTools.passwordStrengthColor[strengthScore]; height:4px; width:18%;"></div>
+                    }
+                </div>
+                <p style="color:#e67b39;">@passwordCommonText</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Confirm Password</RadzenText>
+                <RadzenPassword @bind-Value="tempPasswordConfirmation" Change=@(args => CheckPasswordConfirmation()) Disabled="isLoading" Style="width: 100%" aria-label="Username Textbox" />
+                <p style="color:#e67b39;">@passwordConfirmText</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Company</RadzenText>
+                <RadzenTextBox Disabled="isLoading" Placeholder="Company" @bind-Value="request.configuration.company" Style="width: 100%" aria-label="Username Textbox" />
+            </div>
+            <div style="display:flex; flex-direction:column; gap:inherit.5vh;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">E-Mail</RadzenText>
+                <RadzenTextBox Disabled="isLoading" Placeholder="E-Mail" @bind-Value="request.configuration.email" Style="width: 100%" aria-label="Username Textbox" />
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.5vh;">
+                <RadzenButton Click="RegisterFunc" class="rz-ripple" Style="margin-bottom:1vh; width:100%;" Disabled="isLoading" ButtonStyle="ButtonStyle.Success">
+                    @if (isLoading)
+                    {
+                        <RadzenProgressBarCircular style="height:20px;" ProgressBarStyle="ProgressBarStyle.Secondary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+
+                    }
+                    else
+                    {
+                        <div>Register</div>
+                    }
+                </RadzenButton>
+                <a href="/Login">
+                    <RadzenButton class="rz-ripple" style="width:100%;" Variant="Variant.Outlined" Disabled="isLoading" ButtonStyle="ButtonStyle.Base">To Login</RadzenButton>
+                </a>
+
+            </div>
+
+        </RadzenStack>
+
+
+    </RadzenCard>
+</RadzenStack>
+
+<script>
+    function openInNewTab(url) {
+        window.open(url, '_blank');
+    }
+</script>
+
+@code {
+    /// <summary>
+    /// Represents the request object for registering a new user.
+    /// </summary>
+    private RegisterRequest request = new RegisterRequest();
+
+    /// <summary>
+    /// Indicates whether the loading spinner is active.
+    /// </summary>
+    private bool isLoading = true;
+
+    /// <summary>
+    /// Represents the calculated password strength score.
+    /// </summary>
+    private int strengthScore = 0;
+
+    /// <summary>
+    /// Temporary variable to store the password confirmation entered by the user.
+    /// </summary>
+    private string tempPasswordConfirmation = String.Empty;
+
+    /// <summary>
+    /// Stores the text indicating whether the password and confirmation match.
+    /// </summary>
+    private string passwordConfirmText = String.Empty;
+
+    /// <summary>
+    /// Stores the text indicating whether the password is a commonly used one.
+    /// </summary>
+    private string passwordCommonText = String.Empty;
+
+    /// <summary>
+    /// Lifecycle method invoked when the component is initialized.
+    /// Sets the initial state of the loading spinner.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Handles the user registration process by sending a request to the server.
+    /// Updates user-related configuration and navigates the user to the appropriate page upon successful registration.
+    /// </summary>
+    private async void RegisterFunc()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        // Set request details.
+        request.userName = request.configuration.userName;
+        request.userId = Guid.NewGuid();
+        request.configuration.id = request.userId;
+
+        // Send the registration request.
+        var response = await Logic.UserLogic.UserLogic.RegisterUser(request);
+
+        if (response.userId != Guid.Empty && !String.IsNullOrEmpty(response.jwtToken))
+        {
+            // Update application state.
+            Logic.Root.loggedIn = true;
+            Logic.Root.jwtToken = response.jwtToken;
+            Logic.Root.userName = request.userName;
+            Logic.Root.userId = request.userId;
+
+            var configuration = await Logic.UserLogic.UserLogic.GetUserConfiguration(new GeneralRequest()
+                {
+                    userId = Logic.Root.userId,
+                    userName = Logic.Root.userName,
+                    company = request.configuration.company
+                });
+
+            Logic.Root.userConfiguration = configuration;
+
+            if (configuration.id != Guid.Empty)
+            {
+                // Persist user session data.
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xOne", configuration.id.ToString());
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xTwo", Logic.Root.userName);
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xThree", Logic.Root.userConfiguration.company);
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "xFour", DateTime.Now.ToString());
+                await Logic.SessionLogic.SessionLogic.SetItem(jsRuntime, "lastPage", "Dashboard");
+
+                // Open Stripe payment link in a new tab.
+                await jsRuntime.InvokeVoidAsync("openInNewTab", $"https://buy.stripe.com/3cs9Bt6tZ1fOdNK144?client_reference_id={configuration.id}---{request.userName}");
+
+                // Navigate to the payment confirmation page.
+                navManager.NavigateTo("/PaidCheck");
+            }
+            else
+            {
+                // Show error notification if registration fails.
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Error while registering", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+            }
+        }
+        else
+        {
+            // Show error notification if registration fails.
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Error while registering", Duration = 4000, CloseOnClick = true, Payload = DateTime.Now });
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Displays a notification message to the user.
+    /// </summary>
+    /// <param name="message">The notification message to be displayed.</param>
+    private void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+
+    /// <summary>
+    /// Calculates the strength of the user's password and updates related UI elements.
+    /// Checks whether the password is commonly used or matches the confirmation password.
+    /// </summary>
+    private void CheckPasswordStrength()
+    {
+        strengthScore = Logic.UserLogic.UserTools.CalculatePasswordStrength(request.password, 1_000_000_000);
+        CheckPasswordConfirmation();
+
+        if (Logic.UserLogic.UserTools.commonPasswords.Contains(request.password))
+        {
+            passwordCommonText = "The Password is used a lot. Choose another one";
+        }
+        else
+        {
+            passwordCommonText = String.Empty;
+        }
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Checks if the password confirmation matches the user's password.
+    /// Updates the confirmation text based on the comparison.
+    /// </summary>
+    private void CheckPasswordConfirmation()
+    {
+        if (tempPasswordConfirmation != request.password)
+        {
+            passwordConfirmText = "Passwords are not matching";
+        }
+        else
+        {
+            passwordConfirmText = String.Empty;
+        }
+
+        StateHasChanged();
+    }
+
+}

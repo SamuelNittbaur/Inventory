@@ -1,0 +1,22 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager navigation
+<RadzenComponents />
+
+@Body
+
+<HeadContent>
+    <RadzenTheme Theme="material" />
+</HeadContent>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        if(navigation.Uri.Contains("localhost")){
+            Logic.Root.apiURL = "https://localhost:7012";
+        }
+        else{
+            Logic.Root.apiURL = "https://webcardapi.online";
+        }
+    }
+
+}

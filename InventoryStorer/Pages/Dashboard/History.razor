@@ -1,0 +1,54 @@
+﻿@page "/History"
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <NavigationBar></NavigationBar>
+    <RadzenCard Style="width:95vw;  height:auto; margin-top:2.5vh; margin-bottom:2.5vh;min-width:950px;" class="rz-shadow-6">
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">Historie</RadzenText>
+
+            <RadzenCard Style="height:auto; width:90%; margin-left:%; min-width:900px;" class="rz-shadow-3">
+                <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Logic.Root.history" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(HistoryItem.quantity)" Title="Menge" Frozen="false" Sortable="true" Filterable="true" Width="100px" />
+                        <RadzenDataGridColumn Title="Name" Frozen="false" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                <RadzenText>@Logic.Root.inventory.Find(_item => _item.id == data.productId).name</RadzenText>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(HistoryItem.insertedFrom)" Title="Geändert von" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+
+                        <RadzenDataGridColumn Title="Datum" Frozen="false" Sortable="true" Filterable="true" Width="80px" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                <RadzenText>@data.date.ToString("dd.MM.yyyy")</RadzenText>
+                            </Template>
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn Title="Veränderung" Frozen="false" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                @if (data.quantity < 0)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Genommen" />
+                                }
+                                else
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Aufgestockt" />
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.insertedFrom)" Title="Erstellt von" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Logic.Root.history = new List<HistoryItem>();
+
+        StateHasChanged();
+    }
+}

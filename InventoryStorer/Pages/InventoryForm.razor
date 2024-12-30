@@ -1,0 +1,253 @@
+﻿@page "/InventoryForm"
+@inject IJSRuntime jsRuntime
+@inject DialogService DialogService
+@inject NavigationManager Navigation
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <InventoryStorer.Pages.Dashboard.NavigationBar></InventoryStorer.Pages.Dashboard.NavigationBar>
+    <RadzenCard Style="width:82vw;  height:auto; margin-top:2.5vh;margin-bottom:2.5vh;" class="rz-shadow-6">
+        <RadzenStack>
+            @if (Logic.Root.itemToEdit.id == Guid.Empty)
+            {
+                <RadzenText TextStyle="TextStyle.H4" Style="font-weight:500">
+                    New Item
+                </RadzenText>
+            }
+            else
+            {
+                <RadzenText TextStyle="TextStyle.H4" Style="font-weight:500">
+                    @($"Edit {Logic.Root.itemToEdit.name}")
+                </RadzenText>
+            }
+
+
+            <RadzenStack Gap="2vh;">
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                    <RadzenTextBox @bind-Value="inventoryItem.name" Style="width: 100%" aria-label="TextArea" Disabled="@loading" />
+                </div>
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Quantity</RadzenText>
+                    <RadzenNumeric @bind-Value="inventoryItem.quantity" Style="width: 100%" aria-label="TextArea" Disabled="@loading" />
+                </div>
+                <div style="display:flex; flex-direction:row; gap:0vw;">
+                    <RadzenCheckBox @bind-Value=@inventoryItem.active Name="Archieved" Disabled="@loading" />
+                    <RadzenLabel Text="Aktiv" Component="Archiviert" class="rz-ms-2" />
+                </div>
+
+                <div style="display:flex; flex-direction:row; gap:0vw;">
+                    <RadzenCheckBox @bind-Value=@inventoryItem.notification Name="Alert" Disabled="@loading" />
+                    <RadzenLabel Text="Alert" Component="Alert" class="rz-ms-2" />
+                </div>
+
+                <RadzenCard class="rz-shadow-3">
+                    @if (inventoryItem.notification)
+                    {
+                        <RadzenStack Orientation="Orientation.Horizontal" Style="margin-bottom:20px;" AlignItems="AlignItems.End">
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox @bind-Value="notificationItem.name" Style="width: 100%" aria-label="TextArea" Disabled="@loading" />
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Date</RadzenText>
+                                <RadzenDatePicker @bind-Value="notificationItem.date" Style="width: 100%" Disabled="@loading" DateFormat="dd.MM.yyyy" />
+                            </div>
+                            <RadzenButton Icon="done" ButtonStyle="ButtonStyle.Success" Variant="Variant.Outlined" Click="AddNotification" Style="height:20px;"></RadzenButton>
+                        </RadzenStack>
+                        <RadzenDataGrid @ref="notificationGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                                        Data="@inventoryItem.notifications" ColumnWidth="200px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" TItem="NotificationItem" EmptyText="No Data">
+                            <Columns>
+
+                                <RadzenDataGridColumn Property="@nameof(NotificationItem.name)" Title="Name" Sortable="true" Filterable="true" />
+                                <RadzenDataGridColumn Title="Date" Frozen="false" Sortable="true" Filterable="true" TextAlign="TextAlign.Center">
+                                    <Template Context="data">
+                                        <RadzenText>@data.date.ToString("dd.MM.yyyy")</RadzenText>
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="Remove" Frozen="false" Sortable="false" Filterable="false" TextAlign="TextAlign.Center">
+                                    <Template Context="data">
+                                        <RadzenButton Click="(() => RemoveNotification(data))" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Outlined" Icon="remove"></RadzenButton>
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
+                </RadzenCard>
+                @if (Logic.Root.itemToEdit.id == Guid.Empty)
+                {
+                    <div style="display:flex; flex-direction:column; gap:0vw;">
+                        <RadzenText Text="Unit" TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" />
+                        <RadzenDropDown @bind-Value=@inventoryItem.unit Data=@units Style="width: 100%; max-width: 400px;" Name="DropDownBindValue" />
+                    </div>
+                }
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start" Gap="0.5rem">
+                    <RadzenLabel Text="Category" Component="DropDownBindValue" />
+                    <RadzenDropDown @bind-Value="inventoryItem.category" Data=@Logic.Root.userConfiguration.categories Style="width: 100%; max-width: 400px;" Name="DropDownBindValue" />
+                </RadzenStack>
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Should Quantity</RadzenText>
+                    <RadzenNumeric @bind-Value="inventoryItem.shouldQuantity" Style="width: 100%" aria-label="TextArea" Disabled="@loading" />
+                </div>
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Min Quantity</RadzenText>
+                    <RadzenNumeric @bind-Value="inventoryItem.minQuantity" Style="width: 100%" aria-label="TextArea" Disabled="@loading" />
+                </div>
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Single Price</RadzenText>
+                    <RadzenNumeric @bind-Value="inventoryItem.singlePrice" Style="width: 100%" aria-label="TextArea" Disabled="@loading" Format="c" />
+                </div>
+            </RadzenStack>
+
+            @if (loading)
+            {
+                <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            }
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenButton Icon="done" Click="AddInventory" ButtonStyle="ButtonStyle.Success" Disabled="@loading" class="rz-ripple"></RadzenButton>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+    /// <summary>
+    /// Steuert den Ladezustand der Seite.
+    /// </summary>
+    private bool loading = true;
+
+    /// <summary>
+    /// Repräsentiert das Inventarobjekt, das bearbeitet wird.
+    /// </summary>
+    InventoryItem inventoryItem = new InventoryItem();
+
+    /// <summary>
+    /// Repräsentiert eine Benachrichtigung, die dem Inventar zugeordnet werden kann.
+    /// </summary>
+    private NotificationItem notificationItem = new NotificationItem();
+
+    /// <summary>
+    /// DataGrid-Komponente zur Anzeige von Benachrichtigungen.
+    /// </summary>
+    RadzenDataGrid<NotificationItem> notificationGrid = new RadzenDataGrid<NotificationItem>();
+
+    /// <summary>
+    /// Wird während der Initialisierung der Komponente aufgerufen.
+    /// Lädt die zu bearbeitenden Inventardaten und setzt den Ladezustand.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        if (Logic.Root.itemToEdit.id != Guid.Empty)
+        {
+            inventoryItem = Logic.Root.itemToEdit;
+        }
+        loading = false;
+        StateHasChanged();
+        Logic.Root.unsafePageExit = true;
+    }
+
+    /// <summary>
+    /// Liste von Maßeinheiten, die für Inventarartikel verfügbar sind.
+    /// </summary>
+    List<string> units = new List<string>()
+{
+    "Meter",
+    "Centimeter",
+    "Millimeter",
+    "Kilometer",
+    "Piece",
+    "Liter",
+    "Box",
+    "Kilogram",
+    "Gram",
+    "Ton"
+};
+
+    /// <summary>
+    /// Fügt ein neues Inventarobjekt hinzu oder aktualisiert ein bestehendes.
+    /// </summary>
+    private async void AddInventory()
+    {
+        loading = true;
+        StateHasChanged();
+        Logic.Root.itemToEdit = new InventoryItem();
+        Logic.Root.unsafePageExit = false;
+
+        if (inventoryItem.id == Guid.Empty)
+        {
+            inventoryItem.id = Guid.NewGuid();
+            inventoryItem.history.Add(new HistoryItem()
+                {
+                    insertedFrom = "",
+                    date = DateTime.Now,
+                    id = Guid.NewGuid(),
+                    productId = inventoryItem.id,
+                    quantity = inventoryItem.quantity
+                });
+        }
+
+        inventoryItem.joinDate = DateTime.Now;
+        inventoryItem.insertedFrom = $"{Logic.Root.userConfiguration.firstName} {Logic.Root.userConfiguration.lastName}";
+        var response = await Logic.InventoryLogic.InventoryLogic.InsertNewMaschine(new InventoryRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = inventoryItem
+            });
+
+        Logic.Root.inventory.RemoveAll(_item => _item.id == inventoryItem.id);
+        Logic.Root.inventory.Add(inventoryItem);
+        Navigation.NavigateTo("/Inventory");
+    }
+
+    /// <summary>
+    /// Fügt eine neue Benachrichtigung für das Inventar hinzu.
+    /// </summary>
+    private async void AddNotification()
+    {
+        notificationItem.id = Guid.NewGuid();
+        Appointment appointment = new Appointment()
+            {
+                start = (new DateTime(notificationItem.date.Year, notificationItem.date.Month, notificationItem.date.Day, 0, 0, 0, 0, 0).ToString()),
+                end = (new DateTime(notificationItem.date.Year, notificationItem.date.Month, notificationItem.date.Day, 23, 59, 0, 0, 0).ToString()),
+                _start = new DateTime(notificationItem.date.Year, notificationItem.date.Month, notificationItem.date.Day, 0, 0, 0, 0, 0),
+                _end = new DateTime(notificationItem.date.Year, notificationItem.date.Month, notificationItem.date.Day, 23, 59, 0, 0, 0),
+                id = notificationItem.id.ToString(),
+                text = $"{inventoryItem.name} {notificationItem.name}"
+            };
+
+        var response = await Logic.AppointmentLogic.AppointmentLogic.InsertNewAppointment(new AppointmentRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = appointment
+            });
+
+        inventoryItem.notifications.Add(notificationItem);
+        Logic.Root.appointments.Add(appointment);
+        notificationItem = new NotificationItem();
+
+        notificationGrid.Reload();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Entfernt eine vorhandene Benachrichtigung aus dem Inventar.
+    /// </summary>
+    /// <param name="notification">Die zu entfernende Benachrichtigung.</param>
+    private async void RemoveNotification(NotificationItem notification)
+    {
+        inventoryItem.notifications.RemoveAll(_item => _item.id == notification.id);
+
+        var response = await Logic.AppointmentLogic.AppointmentLogic.DeleteAppointment(new AppointmentRequest()
+            {
+                company = Logic.Root.userConfiguration.company,
+                item = new Appointment()
+                {
+                    id = notification.id.ToString()
+                }
+            });
+
+        notificationGrid.Reload();
+        StateHasChanged();
+    }
+
+}

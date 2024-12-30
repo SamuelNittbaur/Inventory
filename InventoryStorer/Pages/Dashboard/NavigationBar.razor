@@ -1,0 +1,211 @@
+﻿@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject DialogService DialogService
+@using System.Globalization;
+
+@if (isNavigationBarOpen)
+{
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" Style="height:95vh;">
+
+        <RadzenStack Style="width:4vw; min-width:50px; margin-top:2.5vh; padding-left:1vw;margin-right:1vw; max-width:50px" Gap="1vh">
+            <img style="min-width:40px;border-radius:5px;min-height:40px;" src="../favicon.png" />
+            <RadzenButton Click='(() => Navigate("Dashboard"))' Style="width:40px; height:40px;" ButtonStyle='IsSelected("/Dashboard")' Icon="home" class="rz-ripple"></RadzenButton>
+            <RadzenButton Click='(() => Navigate("Inventory"))' Style="width:40px; height:40px;" ButtonStyle='IsSelected("/Inventory")' Icon="assignment" class="rz-ripple"></RadzenButton>
+            @*         <RadzenButton Click='(() => Navigate("History"))' Style="min-width:40px; height:3vw;" ButtonStyle='IsSelected("/History")' Icon="history" class="rz-ripple"></RadzenButton>
+        *@        <RadzenButton Click='(() => Navigate("Calendar"))' Style="width:40px; height:40px;" ButtonStyle='IsSelected("/Calendar")' Icon="date_range" class="rz-ripple"></RadzenButton>
+            <RadzenButton Click='(() => Navigate("Settings"))' Style="width:40px; height:40px;" ButtonStyle='IsSelected("/Settings")' Icon="settings" class="rz-ripple"></RadzenButton>
+            <RadzenButton Click="Logout" Style="width:40px; height:40px;" ButtonStyle="ButtonStyle.Warning" Icon="exit_to_app" class="rz-ripple"></RadzenButton>
+            <div Style="margin-left:0.3vw; color:#929394;" @onclick="ChangeBackgroundColor">
+                <RadzenAppearanceToggle />
+            </div>
+        </RadzenStack>
+
+
+    </RadzenStack>
+}
+
+
+@if (isMobileDevice)
+{
+    <div style="position: fixed; bottom: 0; left: 0; z-index: 999;">
+        <RadzenButton Click="(() => {isNavigationBarOpen = !isNavigationBarOpen; StateHasChanged();})" Icon="list" ButtonStyle="ButtonStyle.Light" Style="margin-left:5px; margin-bottom:5px;"></RadzenButton>
+    </div>
+}
+<script>
+    function toggleBodyColor() {
+    const body = document.body;
+    body.style.backgroundColor = body.style.backgroundColor === 'rgb(31, 30, 30)' ? 'rgb(255, 255, 255)' : 'rgb(31, 30, 30)';
+    }
+
+    function getBodyBackgroundColor() {
+    return window.getComputedStyle(document.body).backgroundColor;
+    }
+
+
+</script>
+
+<script>
+    window.onbeforeunload = function () {
+    DotNet.invokeMethodAsync('OnPageReloaded');
+    };
+</script>
+
+@code {
+    /// <summary>
+    /// Indicates whether the current device is a mobile device.
+    /// </summary>
+    private bool isMobileDevice { get; set; }
+
+    /// <summary>
+    /// Indicates whether the navigation bar is open.
+    /// </summary>
+    private bool isNavigationBarOpen { get; set; } = true;
+
+    /// <summary>
+    /// Initializes the component and determines the device type and API URL.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        isMobileDevice = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
+
+        if (!Navigation.Uri.Contains("localhost")) Logic.Root.apiURL = "https://webcardapi.online";
+    }
+
+    /// <summary>
+    /// Handles logic to reload the page and authenticate the user session.
+    /// </summary>
+    public async void OnPageReloaded()
+    {
+        try
+        {
+            var tempId = await Logic.SessionLogic.SessionLogic.GetItem(JSRuntime, "xOne");
+            var tempUserName = await Logic.SessionLogic.SessionLogic.GetItem(JSRuntime, "xTwo");
+            var tempCompany = await Logic.SessionLogic.SessionLogic.GetItem(JSRuntime, "xThree");
+            var tempDate = await Logic.SessionLogic.SessionLogic.GetItem(JSRuntime, "xFour");
+            var lastPage = await Logic.SessionLogic.SessionLogic.GetItem(JSRuntime, "lastPage");
+
+            if (!String.IsNullOrEmpty(tempId))
+            {
+                string format = "dd.MM.yyyy HH:mm:ss";
+                DateTime date = DateTime.ParseExact(tempDate, format, CultureInfo.InvariantCulture);
+                if ((DateTime.Now - date).TotalDays < 1)
+                {
+                    Guid id = Guid.Parse(tempId);
+                    Logic.Root.userId = id;
+                    var token = await Logic.UserLogic.UserLogic.GetToken(new GeneralRequest()
+                                {
+                                    userId = id,
+                                    userName = tempUserName,
+                                    company = tempCompany
+                                });
+                    if (id != Guid.Empty && !String.IsNullOrEmpty(token))
+                    {
+                        Logic.Root.jwtToken = token;
+                        Logic.Root.userName = tempUserName;
+                        Logic.Root.userId = id;
+                        var configuration = await Logic.UserLogic.UserLogic.GetUserConfiguration(new GeneralRequest()
+                                    {
+                                        userId = Logic.Root.userId,
+                                        userName = Logic.Root.userName,
+                                        company = Logic.Root.userConfiguration.company
+                                    });
+                        if (!configuration.paid) Navigation.NavigateTo($"/NotPaid");
+
+                        if (configuration.id != Guid.Empty)
+                        {
+                            Logic.Root.loggedIn = true;
+
+                            Logic.Root.userConfiguration = configuration;
+
+                            await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xOne", configuration.id.ToString());
+                            await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xTwo", Logic.Root.userName);
+                            await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xThree", Logic.Root.userConfiguration.company);
+                            await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xFour", DateTime.Now.ToString());
+
+                            Navigation.NavigateTo($"/{lastPage}");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            // Handle exception
+        }
+    }
+
+    /// <summary>
+    /// Determines the button style based on whether the navigation URI contains the specified value.
+    /// </summary>
+    /// <param name="value">The value to check in the URI.</param>
+    /// <returns>The style of the button.</returns>
+    private ButtonStyle IsSelected(string value)
+    {
+        if (Navigation.Uri.Contains(value))
+        {
+            return ButtonStyle.Success;
+        }
+        else
+        {
+            return ButtonStyle.Base;
+        }
+    }
+
+    /// <summary>
+    /// Changes the background color of the page by invoking a JavaScript function.
+    /// </summary>
+    private async Task ChangeBackgroundColor()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleBodyColor");
+    }
+
+    /// <summary>
+    /// Navigates to the specified URL while handling page safety and session updates.
+    /// </summary>
+    /// <param name="url">The target URL to navigate to.</param>
+    private async void Navigate(string url)
+    {
+        if (Logic.Root.userConfiguration.paid)
+        {
+            if (Logic.Root.unsafePageExit)
+            {
+                await ShowInlineDialog(url);
+            }
+            else
+            {
+                await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "lastPage", url);
+                Navigation.NavigateTo($"/{url}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Displays an inline dialog to confirm navigation when there are unsaved changes.
+    /// </summary>
+    /// <param name="url">The URL to navigate to if confirmed.</param>
+    private async Task ShowInlineDialog(string url)
+    {
+        var result = await DialogService.OpenAsync(String.Empty, ds =>
+    @<RadzenStack Gap="1.5rem">
+        <p><b>Do you want to leave? Changes could be unsaved!</b></p>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Text="Leave" Click="(() => { Logic.Root.unsafePageExit = false; Navigate(url); })" ButtonStyle="ButtonStyle.Warning" />
+        </RadzenStack>
+    </RadzenStack>);
+    }
+
+    /// <summary>
+    /// Logs out the user and clears session data before redirecting to the login page.
+    /// </summary>
+    private async void Logout()
+    {
+        await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xOne", String.Empty);
+        await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xTwo", String.Empty);
+        await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xThree", String.Empty);
+        await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "xFour", String.Empty);
+        await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "lastPage", String.Empty);
+        Navigation.NavigateTo("/Login");
+    }
+
+}

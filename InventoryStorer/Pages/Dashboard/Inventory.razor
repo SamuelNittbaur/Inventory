@@ -1,0 +1,193 @@
+﻿@page "/Inventory"
+@inject DialogService DialogService
+@inject NavigationManager navigation
+@using System.Globalization;
+@using System.IO
+@inject IJSRuntime JSRuntime
+
+<script>
+    function downloadFile(fileName, base64Content) {
+    const link = document.createElement("a");
+    link.href = `data:text/csv;base64,${base64Content}`;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    }
+</script>
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <NavigationBar></NavigationBar>
+    <RadzenCard Style="width:95vw;  height:auto; margin-top:2.5vh; margin-bottom:2.5vh;max-width:95vw;overflow:scroll;" class="rz-shadow-6">
+        <RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width:90%;">
+                <RadzenText TextStyle="TextStyle.H3" Style="color: var(--rz-text-tertiary-color);">Inventory</RadzenText>
+
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="1vw">
+                    <RadzenButton ButtonStyle="ButtonStyle.Dark" Variant="Variant.Outlined" Text="Export" Click="DownloadCsv" Style="height:30px;"></RadzenButton>
+
+                    <RadzenButton Variant="Variant.Outlined" Click="OpenForm" ButtonStyle="ButtonStyle.Success" Text="+" Style="height:30px;"></RadzenButton>
+                </RadzenStack>
+
+            </RadzenStack>
+
+            <RadzenCard Style="height:auto; width:90%; margin-left:%; min-width:900px; overfow-x:scroll;" class="rz-shadow-3">
+                <RadzenDataGrid @ref="dataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Logic.Root.inventory" ColumnWidth="200px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" TItem="InventoryItem" RowClick="((args) => OpenInventoryDetail(args.Data))">
+                    <Columns>
+
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.name)" Title="Name" Frozen="false" Sortable="true" Filterable="true" />
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.quantity)" Title="Quantity" Sortable="true" Filterable="true" />
+                        <RadzenDataGridColumn Title="Status" Frozen="false" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                @if (data.quantity < data.shouldQuantity)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Under should value" />
+                                }
+                                else
+                                {
+                                    @if (data.status == Status.Empty)
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Empty" />
+                                    }
+                                    else if (data.status == Status.New)
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Dark" Text="New" />
+                                    }
+                                    else if (data.status == Status.Reserverd)
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Reserved" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Full" />
+                                    }
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.category)" Title="Category" Sortable="true" Filterable="true" />
+                        <RadzenDataGridColumn Title="Singleprice" Frozen="false" Sortable="true" Filterable="true" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                <RadzenText>@data.singlePrice.ToString("C", new CultureInfo("de-DE"))</RadzenText>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="Inventoryvalue" Frozen="false" Sortable="true" Filterable="true" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                <RadzenText>@data.sum().ToString("C", new CultureInfo("de-DE"))</RadzenText>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.unit)" Title="Unit" Sortable="true" Filterable="true" />
+                        <RadzenDataGridColumn Title="Creation Date" Frozen="false" Sortable="true" Filterable="true" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                <RadzenText>@data.joinDate.ToString("dd.MM.yyyy")</RadzenText>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        @*   <RadzenDataGridColumn Title="History" Frozen="false" Sortable="false" Filterable="false" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                <RadzenSparkline style="width: 100%; height: 30px" ColorScheme="ColorScheme.Divergent">
+                                    <RadzenAreaSeries Smooth="true" Data="@data.history" Title="Score" CategoryProperty="@nameof(HistoryItem.date)" ValueProperty="@nameof(HistoryItem.quantity)" />
+                                    <RadzenCategoryAxis Visible="false" Padding="-20" />
+                                </RadzenSparkline>
+                            </Template>
+                        </RadzenDataGridColumn> *@
+                        <RadzenDataGridColumn Title="Alert" Frozen="false" Sortable="false" Filterable="false" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                @if (data.notification)
+                                {
+                                    <RadzenText>Yes</RadzenText>
+                                }
+                                else
+                                {
+                                    <RadzenText>No</RadzenText>
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.minQuantity)" Title="Min  Quantity" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+                        <RadzenDataGridColumn Property="@nameof(InventoryItem.shouldQuantity)" Title="Should Quantity" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+
+
+                        <RadzenDataGridColumn Title="Active" Frozen="false" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+                            <Template Context="data">
+                                @if (data.active)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Active" />
+                                }
+                                else
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Inactive" />
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        @if (Logic.FeatureFlip.insertedFrom)
+                        {
+                            <RadzenDataGridColumn Property="@nameof(InventoryItem.insertedFrom)" Title="Erstellt von" Frozen="false" Sortable="true" Filterable="true" Width="160px" />
+                        }
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+    /// <summary>
+    /// A data grid displaying inventory items.
+    /// </summary>
+    RadzenDataGrid<InventoryItem> dataGrid = new RadzenDataGrid<InventoryItem>();
+
+    /// <summary>
+    /// Opens a detailed view of a specific inventory item in a dialog.
+    /// </summary>
+    /// <param name="inventory">The inventory item to display details for.</param>
+    private async void OpenInventoryDetail(InventoryItem inventory)
+    {
+        await DialogService.OpenAsync<InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog>($"{inventory.name}",
+        new Dictionary<string, object>()
+            {
+        { "inventory", inventory },
+        { "grid", dataGrid }
+            },
+        new DialogOptions()
+            {
+                Resizable = true,
+                Draggable = true,
+                ShowClose = false,
+                Width = "70vw",
+                Height = "70vh",
+            });
+    }
+
+    /// <summary>
+    /// Generates a CSV file from the inventory data and initiates a download.
+    /// </summary>
+    private async Task DownloadCsv()
+    {
+        var csv = Logic.ExportLogic.ExportManager.GenerateCsv(Logic.Root.inventory);
+        var fileName = "Inventory.csv";
+        await DownloadFile(csv, fileName);
+    }
+
+    /// <summary>
+    /// Downloads a file with the given content and filename.
+    /// </summary>
+    /// <param name="content">The content of the file to download.</param>
+    /// <param name="fileName">The name of the file to download.</param>
+    private async Task DownloadFile(string content, string fileName)
+    {
+        var fileContent = System.Text.Encoding.UTF8.GetBytes(content);
+        var base64Content = Convert.ToBase64String(fileContent);
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, base64Content);
+    }
+
+    /// <summary>
+    /// Navigates to the inventory form and sets the last visited page.
+    /// </summary>
+    private async void OpenForm()
+    {
+        await Logic.SessionLogic.SessionLogic.SetItem(JSRuntime, "lastPage", "InventoryForm");
+        navigation.NavigateTo("InventoryForm");
+    }
+
+}
