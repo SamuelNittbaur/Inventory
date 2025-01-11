@@ -1,0 +1,765 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>InventoryStorer</name>
+    </assembly>
+    <members>
+        <member name="M:Logic.UserLogic.UserLogic.RegisterUser(Logic.Shared.RegisterRequest)">
+            <summary>
+            Registers a new user with the provided registration data.
+            </summary>
+            <param name="register">The registration data.</param>
+            <returns>A <see cref="T:Logic.Shared.RegisterResponse"/> containing the registration result.</returns>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.GetToken(Logic.Shared.GeneralRequest)">
+            <summary>
+            Retrieves a token using the provided general request data.
+            </summary>
+            <param name="register">The general request data.</param>
+            <returns>A string containing the token, or an empty string if unsuccessful.</returns>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.Login(Logic.Shared.LoginRequest)">
+            <summary>
+            Logs in a user with the provided login request data.
+            </summary>
+            <param name="register">The login request data.</param>
+            <returns>A <see cref="T:Logic.Shared.Loginresponse"/> containing the login result.</returns>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.GetUserConfiguration(Logic.Shared.GeneralRequest)">
+            <summary>
+            Retrieves the user configuration based on the provided request data.
+            </summary>
+            <param name="request">The request data containing necessary details for retrieving the user configuration.</param>
+            <returns>
+            A <see cref="T:Logic.Shared.UserConfiguration"/> object containing the user configuration details.
+            Returns a default <see cref="T:Logic.Shared.UserConfiguration"/> object if the operation fails.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error while sending the HTTP request.
+            </exception>
+            <exception cref="T:System.Exception">
+            Thrown if there is a general exception during the operation.
+            </exception>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.SendPasswordEmail(Logic.Shared.GeneralRequest)">
+            <summary>
+            Sends a password reset email based on the provided request data.
+            </summary>
+            <param name="request">The request data containing the necessary details to send the password reset email.</param>
+            <returns>
+            A <see cref="T:System.Boolean"/> indicating the success of the operation.
+            Returns <c>true</c> if the email was sent successfully, otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error while sending the HTTP request.
+            </exception>
+            <exception cref="T:System.Exception">
+            Thrown if a general exception occurs during the operation.
+            </exception>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.ResetPassword(Logic.Shared.ResetPasswordRequest)">
+            <summary>
+            Resets the password for a user based on the provided reset password request data.
+            </summary>
+            <param name="request">The request data containing the details required to reset the password.</param>
+            <returns>
+            A <see cref="T:System.Boolean"/> indicating the success of the operation.
+            Returns <c>true</c> if the password reset was successful, otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error while sending the HTTP request.
+            </exception>
+            <exception cref="T:System.Exception">
+            Thrown if a general exception occurs during the operation.
+            </exception>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.ChangePassword(Logic.Shared.ResetPasswordRequest)">
+            <summary>
+            Changes the password for a user based on the provided reset password request data.
+            </summary>
+            <param name="request">The request data containing the details required to change the password.</param>
+            <returns>
+            A <see cref="T:System.Boolean"/> indicating whether the password change was successful.
+            Returns <c>true</c> if the password was successfully changed, otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error while sending the HTTP request.
+            </exception>
+            <exception cref="T:System.Exception">
+            Thrown if a general exception occurs during the operation.
+            </exception>
+            <remarks>
+            This method uses a security header and a bearer token for authentication.
+            The request data is encrypted before being sent to the server, and the response is decrypted upon receipt.
+            </remarks>
+        </member>
+        <member name="M:Logic.UserLogic.UserLogic.CreateUserConfiguration(Logic.Shared.UserConfiguration)">
+            <summary>
+            Creates or updates a user configuration based on the provided configuration data.
+            </summary>
+            <param name="request">The user configuration data that will be sent to the server to create or update the user's configuration.</param>
+            <returns>
+            A <see cref="T:System.Boolean"/> indicating whether the operation was successful.
+            Returns <c>true</c> if the configuration was successfully created or updated, otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error while sending the HTTP request.
+            </exception>
+            <exception cref="T:System.Exception">
+            Thrown if a general exception occurs during the operation.
+            </exception>
+            <remarks>
+            This method sends the user configuration data to the server, where it is encrypted before transmission.
+            The server's response is also encrypted, and the data is decrypted upon receipt.
+            The method uses a security header and a bearer token for authentication.
+            </remarks>
+        </member>
+        <member name="P:InventoryStorer.Pages.ChangePassword.id">
+            Represents the Reset Password component.
+            Gets or sets the user ID parameter passed to the component.
+            This value is used to identify the user whose password needs to be reset.
+        </member>
+        <member name="P:InventoryStorer.Pages.ChangePassword.userName">
+            Gets or sets the username parameter passed to the component.
+            This value is used in the reset password request to specify the user.
+        </member>
+        <member name="F:InventoryStorer.Pages.ChangePassword.isLoading">
+            Indicates whether the reset password process is currently loading.
+        </member>
+        <member name="F:InventoryStorer.Pages.ChangePassword.request">
+            Represents the reset password request containing the user's ID and username.
+        </member>
+        <member name="M:InventoryStorer.Pages.ChangePassword.ChangePasswordFunc">
+            Initiates the password change process by sending a reset password request.
+            Displays a notification message based on the result of the operation.
+        </member>
+        <member name="M:InventoryStorer.Pages.ChangePassword.ShowNotification(Radzen.NotificationMessage)">
+             Displays a notification message to the user.
+            
+             @param message The notification message to be displayed.
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Calendar.scheduler">
+            <summary>
+            Die Scheduler-Komponente, die die Verwaltung und Anzeige von Terminen ermöglicht.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Calendar.events">
+            <summary>
+            Ein Wörterbuch, das bestimmte Ereignisse nach Datum speichert.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Calendar.OnSlotRender(Radzen.SchedulerSlotRenderEventArgs)">
+            <summary>
+            Wird aufgerufen, wenn ein Slot im Scheduler gerendert wird.
+            Ermöglicht die Anpassung des Erscheinungsbilds bestimmter Zeitslots, wie z. B. das Hervorheben von Arbeitszeiten oder dem aktuellen Datum.
+            </summary>
+            <param name="args">Die Argumente für das Slot-Render-Ereignis.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Calendar.OnSlotSelect(Radzen.SchedulerSlotSelectEventArgs)">
+            <summary>
+            Wird ausgelöst, wenn ein Zeitslot im Scheduler ausgewählt wird.
+            Öffnet einen Dialog, um einen neuen Termin für den ausgewählten Zeitraum hinzuzufügen.
+            </summary>
+            <param name="args">Die Argumente für das Slot-Select-Ereignis.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Calendar.OnAppointmentSelect(Radzen.SchedulerAppointmentSelectEventArgs{Logic.Shared.Appointment})">
+            <summary>
+            Wird ausgelöst, wenn ein Termin im Scheduler ausgewählt wird.
+            Öffnet einen Dialog, um den ausgewählten Termin zu bearbeiten.
+            </summary>
+            <param name="args">Die Argumente für das Appointment-Select-Ereignis.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Calendar.OnAppointmentRender(Radzen.SchedulerAppointmentRenderEventArgs{Logic.Shared.Appointment})">
+            <summary>
+            Wird ausgelöst, wenn ein Termin im Scheduler gerendert wird.
+            Ermöglicht die Anpassung des Erscheinungsbilds eines Termins.
+            </summary>
+            <param name="args">Die Argumente für das Appointment-Render-Ereignis.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Calendar.OnAppointmentMove(Radzen.SchedulerAppointmentMoveEventArgs)">
+            <summary>
+            Wird ausgelöst, wenn ein Termin im Scheduler verschoben wird.
+            Aktualisiert die Start- und Endzeit des verschobenen Termins.
+            </summary>
+            <param name="args">Die Argumente für das Appointment-Move-Ereignis.</param>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.categoryCount">
+            <summary>
+            Repräsentiert eine Sammlung von Datenobjekten für die Kategorieanzahl.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.inventoryQuantity">
+            <summary>
+            Repräsentiert die Inventarmenge.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.inventoryQuantityLastYear">
+            <summary>
+            Repräsentiert die Inventarmenge vom letzten Jahr.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.inventoryBookings">
+            <summary>
+            Repräsentiert die Buchungen des Inventars.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.inventoryBookingsLastYear">
+            <summary>
+            Repräsentiert die Buchungen des Inventars vom letzten Jahr.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.inventoryValue">
+            <summary>
+            Repräsentiert den Inventarwert.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.inventoryValueLastYear">
+            <summary>
+            Repräsentiert den Inventarwert vom letzten Jahr.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.quantityChart">
+            <summary>
+            Ein Diagramm zur Darstellung der Inventarmenge.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.bookingsChart">
+            <summary>
+            Ein Diagramm zur Darstellung der Inventarbuchungen.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.valueChart">
+            <summary>
+            Ein Diagramm zur Darstellung des Inventarwertes.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.rnd">
+            <summary>
+            Instanz eines Zufallsgenerators.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.missingCauses">
+            <summary>
+            Eine Liste, die fehlende Ursachen enthält.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.OnInitializedAsync">
+            <summary>
+            Initialisiert die Komponente und lädt die Inventar- und Termin-Daten.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.GetInventoryStates(System.Double,System.Collections.Generic.List{Logic.Shared.HistoryItem})">
+            <summary>
+            Ermittelt die Inventarzustände basierend auf dem aktuellen Inventar und den historischen Änderungen.
+            </summary>
+            <param name="currentInventory">Der aktuelle Inventarstand.</param>
+            <param name="changes">Die Liste der historischen Änderungen.</param>
+            <returns>Ein Dictionary mit den Inventarzuständen nach Monaten.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.GetSinglePrice(System.Guid)">
+            <summary>
+            Ermittelt den Einzelpreis für ein Produkt basierend auf der Produkt-ID.
+            </summary>
+            <param name="productId">Die Produkt-ID.</param>
+            <returns>Der Einzelpreis des Produkts.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.GetMonthName(System.Int32)">
+            <summary>
+            Gibt den Namen eines Monats basierend auf einer ganzzahligen Eingabe zurück.
+            </summary>
+            <param name="month">Die Nummer des Monats (1-12).</param>
+            <returns>Der Name des Monats als String.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.CalculateRemainingInventory(Logic.Shared.InventoryItem,System.Double,System.Int32,System.Int32)">
+            <summary>
+            Berechnet den verbleibenden Bestand eines Inventarartikels für ein bestimmtes Jahr und einen bestimmten Monat.
+            </summary>
+            <param name="inventory">Das Inventarobjekt.</param>
+            <param name="initialInventory">Der anfängliche Bestand.</param>
+            <param name="year">Das Jahr für die Berechnung.</param>
+            <param name="month">Der Monat für die Berechnung.</param>
+            <returns>Der verbleibende Bestand als Double.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.CalculateInventoryBookings(Logic.Shared.InventoryItem,System.Double,System.Int32,System.Int32)">
+            <summary>
+            Berechnet die Anzahl der Buchungen für ein Inventar in einem bestimmten Jahr und Monat.
+            </summary>
+            <param name="inventory">Das Inventarobjekt.</param>
+            <param name="initialInventory">Der anfängliche Bestand.</param>
+            <param name="year">Das Jahr für die Berechnung.</param>
+            <param name="month">Der Monat für die Berechnung.</param>
+            <returns>Die Anzahl der Buchungen als Double.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.CalculateInventoryValue(Logic.Shared.InventoryItem,System.Double,System.Int32,System.Int32)">
+            <summary>
+            Berechnet den Wert des Inventars für ein bestimmtes Jahr und einen bestimmten Monat.
+            </summary>
+            <param name="inventory">Das Inventarobjekt.</param>
+            <param name="initialInventory">Der anfängliche Bestand.</param>
+            <param name="year">Das Jahr für die Berechnung.</param>
+            <param name="month">Der Monat für die Berechnung.</param>
+            <returns>Der Wert des verbleibenden Inventars als Double.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.FormatAsEUR(System.Object)">
+            <summary>
+            Formatiert einen numerischen Wert als Währung im Euro-Format.
+            </summary>
+            <param name="value">Der zu formatierende Wert.</param>
+            <returns>Der formatierte Wert als String.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.GetInventoryQuantity">
+            <summary>
+            Berechnet die Gesamtsumme der Inventarmengen.
+            </summary>
+            <returns>Die Gesamtmenge des Inventars als Double.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.GetInventoryValue">
+            <summary>
+            Berechnet den Gesamtwert des Inventars.
+            </summary>
+            <returns>Der Gesamtwert des Inventars als Double.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dashboard.GetInventoryBookingsThisMonth">
+            <summary>
+            Berechnet die Anzahl der Buchungen für das aktuelle Monat.
+            </summary>
+            <returns>Die Anzahl der Buchungen als Integer.</returns>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dashboard.fillRange">
+            <summary>
+            Eine Liste von Farbskalen basierend auf numerischen Bereichen.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.AddAppointmentDialog.Start">
+            <summary>
+            Der Startzeitpunkt des Termins.
+            </summary>
+            <value>Ein DateTime-Wert, der den Startzeitpunkt repräsentiert.</value>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.AddAppointmentDialog.End">
+            <summary>
+            Der Endzeitpunkt des Termins.
+            </summary>
+            <value>Ein DateTime-Wert, der den Endzeitpunkt repräsentiert.</value>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.AddAppointmentDialog.model">
+            <summary>
+            Repräsentiert das aktuelle Terminmodell, das bearbeitet oder erstellt wird.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.AddAppointmentDialog.OnParametersSet">
+            <summary>
+            Wird aufgerufen, wenn die Parameter gesetzt werden.
+            Initialisiert die Start- und Endzeit des Terminmodells basierend auf den übergebenen Parametern.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.AddAppointmentDialog.OnSubmit(Logic.Shared.Appointment)">
+            <summary>
+            Wird beim Absenden des Formulars aufgerufen.
+            Schließt das Dialogfenster und gibt das aktuelle Terminmodell zurück.
+            </summary>
+            <param name="model">Das Terminmodell, das übergeben wird.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.AddAppointmentDialog.UpdateAppointment">
+            <summary>
+            Aktualisiert den Termin, indem ein neuer Eintrag in der Datenbank erstellt wird.
+            Generiert eine eindeutige ID für das Terminmodell und sendet die Anfrage an die API.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.EditAppointmentDialog._appointment">
+            <summary>
+            Das aktuelle Terminmodell, das als Parameter an die Komponente übergeben wird.
+            </summary>
+            <value>Ein <see cref="T:Logic.Shared.Appointment"/>-Objekt, das den zu bearbeitenden oder anzuzeigenden Termin enthält.</value>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.EditAppointmentDialog.model">
+            <summary>
+            Lokale Instanz des Terminmodells, die innerhalb der Komponente verwendet wird.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.EditAppointmentDialog.OnParametersSet">
+            <summary>
+            Wird aufgerufen, wenn die Parameter der Komponente gesetzt werden.
+            Aktualisiert das lokale Modell mit dem übergebenen Terminmodell.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.EditAppointmentDialog.OnSubmit(Logic.Shared.Appointment)">
+            <summary>
+            Wird beim Absenden des Formulars aufgerufen.
+            Schließt das Dialogfenster und gibt das aktuelle Terminmodell zurück.
+            </summary>
+            <param name="model">Das Terminmodell, das übergeben wird.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.EditAppointmentDialog.UpdateAppointment">
+            <summary>
+            Aktualisiert den Termin, indem ein neuer Eintrag in der Datenbank erstellt wird.
+            Sendet die Anfrage an die API mit dem aktuellen Terminmodell.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.grid">
+            <summary>
+            Die DataGrid-Komponente, die die Bestandsdaten anzeigt und verwaltet.
+            </summary>
+            <value>Ein <see cref="T:Radzen.Blazor.RadzenDataGrid`1"/>-Objekt, das für die Bestandsanzeige verwendet wird.</value>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.inventory">
+            <summary>
+            Das aktuelle Bestandsobjekt, das bearbeitet oder analysiert wird.
+            </summary>
+            <value>Ein <see cref="T:Logic.Shared.InventoryItem"/>-Objekt, das den Bestand repräsentiert.</value>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.tempHistoryItem">
+            <summary>
+            Temporäres Historienelement, das für neue Einträge in der Bestandsgeschichte verwendet wird.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.tookItem">
+            <summary>
+            Gibt an, ob ein Artikel aus dem Bestand entnommen wird.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.loading">
+            <summary>
+            Gibt an, ob ein Vorgang aktuell geladen wird.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.historyStat">
+            <summary>
+            Enthält die berechneten historischen Daten für die Bestandsentwicklung.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.historyChart">
+            <summary>
+            Die Chart-Komponente, die die Bestandsstatistiken visualisiert.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.historyGrid">
+            <summary>
+            Die DataGrid-Komponente, die die Bestandsgeschichte anzeigt.
+            </summary>
+        </member>
+        <member name="T:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.DataItem">
+            <summary>
+            Klasse für die Darstellung von Datenpunkten in der Bestandsstatistik.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.DataItem.Quarter">
+            <summary>
+            Der Name des Quartals oder Monats.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.DataItem.Revenue">
+            <summary>
+            Der Umsatz oder der verbleibende Bestand für das jeweilige Quartal oder den Monat.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.OnInitializedAsync">
+            <summary>
+            Wird bei der Initialisierung der Komponente aufgerufen. Berechnet die Bestandsgeschichte.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.DeleteItem">
+            <summary>
+            Markiert den Artikel als gelöscht, aktualisiert die Datenbank und entfernt den Artikel aus der Ansicht.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.CalculateHistory">
+            <summary>
+            Berechnet die Bestandsentwicklung für das aktuelle Jahr und aktualisiert die Statistik.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.CalculateRemainingInventory(System.Double,System.Int32,System.Int32)">
+            <summary>
+            Berechnet den verbleibenden Bestand basierend auf dem initialen Bestand, dem Jahr und dem Monat.
+            </summary>
+            <param name="initialInventory">Der anfängliche Bestand.</param>
+            <param name="year">Das Jahr, für das der Bestand berechnet wird.</param>
+            <param name="month">Der Monat, für den der Bestand berechnet wird.</param>
+            <returns>Der verbleibende Bestand.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.EditInventoryItem">
+            <summary>
+            Leitet die Bearbeitung eines Bestandsartikels ein und navigiert zum Formular zur Bearbeitung.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Dialogs.InventoryDetailDialog.TakeItem">
+            <summary>
+            Fügt ein neues Historienelement hinzu, aktualisiert den Bestand und die Datenbank.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Inventory.dataGrid">
+            <summary>
+            A data grid displaying inventory items.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Inventory.OpenInventoryDetail(Logic.Shared.InventoryItem)">
+            <summary>
+            Opens a detailed view of a specific inventory item in a dialog.
+            </summary>
+            <param name="inventory">The inventory item to display details for.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Inventory.DownloadCsv">
+            <summary>
+            Generates a CSV file from the inventory data and initiates a download.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Inventory.DownloadFile(System.String,System.String)">
+            <summary>
+            Downloads a file with the given content and filename.
+            </summary>
+            <param name="content">The content of the file to download.</param>
+            <param name="fileName">The name of the file to download.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Inventory.OpenForm">
+            <summary>
+            Navigates to the inventory form and sets the last visited page.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.NavigationBar.isMobileDevice">
+            <summary>
+            Indicates whether the current device is a mobile device.
+            </summary>
+        </member>
+        <member name="P:InventoryStorer.Pages.Dashboard.NavigationBar.isNavigationBarOpen">
+            <summary>
+            Indicates whether the navigation bar is open.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.OnInitializedAsync">
+            <summary>
+            Initializes the component and determines the device type and API URL.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.OnPageReloaded">
+            <summary>
+            Handles logic to reload the page and authenticate the user session.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.IsSelected(System.String)">
+            <summary>
+            Determines the button style based on whether the navigation URI contains the specified value.
+            </summary>
+            <param name="value">The value to check in the URI.</param>
+            <returns>The style of the button.</returns>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.ChangeBackgroundColor">
+            <summary>
+            Changes the background color of the page by invoking a JavaScript function.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.Navigate(System.String)">
+            <summary>
+            Navigates to the specified URL while handling page safety and session updates.
+            </summary>
+            <param name="url">The target URL to navigate to.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.ShowInlineDialog(System.String)">
+            <summary>
+            Displays an inline dialog to confirm navigation when there are unsaved changes.
+            </summary>
+            <param name="url">The URL to navigate to if confirmed.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.NavigationBar.Logout">
+            <summary>
+            Logs out the user and clears session data before redirecting to the login page.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Settings.isLoading">
+            <summary>
+            Indicates whether a loading process is currently active.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Settings.request">
+            <summary>
+            A general request object used for various operations.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.Dashboard.Settings.tempCategory">
+            <summary>
+            Temporarily stores the category input from the user.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Settings.ForgotPasswortFunc">
+            <summary>
+            Handles the logic for initiating a password recovery email.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Settings.SafeCategories">
+            <summary>
+            Saves the current temporary category to the user configuration.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.Dashboard.Settings.ShowNotification(Radzen.NotificationMessage)">
+            <summary>
+            Displays a notification message to the user.
+            </summary>
+            <param name="message">The notification message to display.</param>
+        </member>
+        <member name="F:InventoryStorer.Pages.InventoryForm.loading">
+            <summary>
+            Steuert den Ladezustand der Seite.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.InventoryForm.inventoryItem">
+            <summary>
+            Repräsentiert das Inventarobjekt, das bearbeitet wird.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.InventoryForm.notificationItem">
+            <summary>
+            Repräsentiert eine Benachrichtigung, die dem Inventar zugeordnet werden kann.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.InventoryForm.notificationGrid">
+            <summary>
+            DataGrid-Komponente zur Anzeige von Benachrichtigungen.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.InventoryForm.OnInitializedAsync">
+            <summary>
+            Wird während der Initialisierung der Komponente aufgerufen.
+            Lädt die zu bearbeitenden Inventardaten und setzt den Ladezustand.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.InventoryForm.units">
+            <summary>
+            Liste von Maßeinheiten, die für Inventarartikel verfügbar sind.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.InventoryForm.AddInventory">
+            <summary>
+            Fügt ein neues Inventarobjekt hinzu oder aktualisiert ein bestehendes.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.InventoryForm.AddNotification">
+            <summary>
+            Fügt eine neue Benachrichtigung für das Inventar hinzu.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.InventoryForm.RemoveNotification(Logic.Shared.NotificationItem)">
+            <summary>
+            Entfernt eine vorhandene Benachrichtigung aus dem Inventar.
+            </summary>
+            <param name="notification">Die zu entfernende Benachrichtigung.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.PaidCheck.OnInitializedAsync">
+            <summary>
+            Wird während der Initialisierung der Komponente aufgerufen.
+            Startet den Prozess zur Überprüfung der Benutzerkonfiguration.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.PaidCheck.CheckIterate">
+            <summary>
+            Überprüft rekursiv die Benutzerkonfiguration, um festzustellen, ob der Benutzer ein bezahlter Kunde ist.
+            Falls bezahlt, wird der Benutzer zur Dashboard-Seite weitergeleitet. Andernfalls wird die Überprüfung nach einer Verzögerung erneut durchgeführt.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.ForgotPassword.isLoading">
+            <summary>
+            Indicates whether a loading process is currently active.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.ForgotPassword.request">
+            <summary>
+            A general request object used for various operations.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.ForgotPassword.ForgotPasswortFunc">
+            <summary>
+            Handles the logic for initiating a password recovery email.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.ForgotPassword.ShowNotification(Radzen.NotificationMessage)">
+            <summary>
+            Displays a notification message to the user.
+            </summary>
+            <param name="message">The notification message to display.</param>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Login.isLoading">
+            <summary>
+            Indicates whether a loading process is currently active.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Login.request">
+            <summary>
+            Represents the login request details such as username and password.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Login.OnInitializedAsync">
+            <summary>
+            Initializes the component by checking session data and user authentication.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Login.LoginFunc">
+            <summary>
+            Executes the login functionality, authenticates the user, and navigates to the dashboard if successful.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Login.ShowNotification(Radzen.NotificationMessage)">
+            <summary>
+            Displays a notification message to the user.
+            </summary>
+            <param name="message">The notification message to display.</param>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Register.request">
+            <summary>
+            Represents the request object for registering a new user.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Register.isLoading">
+            <summary>
+            Indicates whether the loading spinner is active.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Register.strengthScore">
+            <summary>
+            Represents the calculated password strength score.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Register.tempPasswordConfirmation">
+            <summary>
+            Temporary variable to store the password confirmation entered by the user.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Register.passwordConfirmText">
+            <summary>
+            Stores the text indicating whether the password and confirmation match.
+            </summary>
+        </member>
+        <member name="F:InventoryStorer.Pages.User.Register.passwordCommonText">
+            <summary>
+            Stores the text indicating whether the password is a commonly used one.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Register.OnInitializedAsync">
+            <summary>
+            Lifecycle method invoked when the component is initialized.
+            Sets the initial state of the loading spinner.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Register.RegisterFunc">
+            <summary>
+            Handles the user registration process by sending a request to the server.
+            Updates user-related configuration and navigates the user to the appropriate page upon successful registration.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Register.ShowNotification(Radzen.NotificationMessage)">
+            <summary>
+            Displays a notification message to the user.
+            </summary>
+            <param name="message">The notification message to be displayed.</param>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Register.CheckPasswordStrength">
+            <summary>
+            Calculates the strength of the user's password and updates related UI elements.
+            Checks whether the password is commonly used or matches the confirmation password.
+            </summary>
+        </member>
+        <member name="M:InventoryStorer.Pages.User.Register.CheckPasswordConfirmation">
+            <summary>
+            Checks if the password confirmation matches the user's password.
+            Updates the confirmation text based on the comparison.
+            </summary>
+        </member>
+    </members>
+</doc>

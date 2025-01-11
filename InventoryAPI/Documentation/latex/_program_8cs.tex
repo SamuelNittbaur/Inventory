@@ -1,0 +1,221 @@
+\doxysection{C\+:/\+Users/samue/source/repos/\+Inventory\+Project/\+Inventory\+API/\+Program.cs File Reference}
+\hypertarget{_program_8cs}{}\label{_program_8cs}\index{C:/Users/samue/source/repos/InventoryProject/InventoryAPI/Program.cs@{C:/Users/samue/source/repos/InventoryProject/InventoryAPI/Program.cs}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_security_header_middleware}{Security\+Header\+Middleware}}
+\item 
+class \mbox{\hyperlink{class_ip_rate_limiting_middleware}{Ip\+Rate\+Limiting\+Middleware}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_a0d7859f9cad50e8e9fdf015100780e07}{Add\+Endpoints\+Api\+Explorer}} ()
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_ae0ce43c019a5621d731d0c622c793644}{Add\+Swagger\+Gen}} ()
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_a2d790ba399ab14c04dcaa036f6457fe9}{Add\+Cors}} (options=$>$ \{ options.\+Add\+Policy("{}Allow\+All"{}, \mbox{\hyperlink{_program_8cs_a2f78352277081c620fd4cf92a5ce15e5}{builder}}=$>$ \{ builder.\+Allow\+Any\+Origin() .Allow\+Any\+Method() .Allow\+Any\+Header();\});\})
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_aa55cf0fb58eefec93f7cb32e3ac551e8}{Add\+Authentication}} (options=$>$ \{ options.\+Default\+Authenticate\+Scheme=Jwt\+Bearer\+Defaults.\+Authentication\+Scheme;options.\+Default\+Challenge\+Scheme=Jwt\+Bearer\+Defaults.\+Authentication\+Scheme;options.\+Default\+Scheme=Jwt\+Bearer\+Defaults.\+Authentication\+Scheme;\}) .Add\+Jwt\+Bearer(options
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_ae5ec6d7548eaed13afc397f42272d5a8}{Add\+Authorization}} ()
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_abc3694a0e15618f2499e5a540264f833}{Add\+Controllers}} ()
+\item 
+builder.\+Services. \mbox{\hyperlink{_program_8cs_ad77bab25169a56d2b1b51749467181fc}{Add\+Open\+Telemetry}} () .With\+Metrics(metrics
+\item 
+\mbox{\hyperlink{_program_8cs_a79a944c7f0e25196ca3c5a8638b919b9}{if}} (app.\+Environment.\+Is\+Development())
+\item 
+Environment. \mbox{\hyperlink{_program_8cs_afd3c97f58cca79acd37800c271621e1d}{Set\+Environment\+Variable}} ("{}GOOGLE\+\_\+\+APPLICATION\+\_\+\+CREDENTIALS"{}, \mbox{\hyperlink{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7}{relative\+Path}}, Environment\+Variable\+Target.\+Process)
+\item 
+app. \mbox{\hyperlink{_program_8cs_a34889d5e8e9690eab4abac71a39812cf}{Use\+Middleware$<$ Security\+Header\+Middleware $>$}} ()
+\item 
+app. \mbox{\hyperlink{_program_8cs_a256c37e8478a2206072164e132c40b50}{Use\+Middleware$<$ Ip\+Rate\+Limiting\+Middleware $>$}} (50, Time\+Span.\+From\+Seconds(30), Time\+Span.\+From\+Minutes(3))
+\item 
+app. \mbox{\hyperlink{_program_8cs_a0e2735521aa751e90e009545114aa9c5}{Use\+Exception\+Handler}} (error\+App=$>$ \{ \mbox{\hyperlink{_program_8cs_aaa3dbf02e269c3ef7e8546d290c6b3dd}{error\+App.\+Run}}(async context=$>$ \{ var exception\+Handler\+Path\+Feature=context.\+Features.\+Get$<$ IException\+Handler\+Path\+Feature $>$();var exception=exception\+Handler\+Path\+Feature?.Error;await context.\+Response.\+Write\+Async("{}An error occurred."{});\});\})
+\item 
+app. \mbox{\hyperlink{_program_8cs_a906a3ce545279a7a73941f1d7b64d7cf}{Use\+Static\+Files}} ()
+\item 
+app. \mbox{\hyperlink{_program_8cs_a9e2ee3170aa6279b68eefd1651f7d96c}{Map\+Controllers}} ()
+\item 
+app. \mbox{\hyperlink{_program_8cs_a0a7b080f8fbf578227b41f824d2bcec5}{Use\+Cors}} ()
+\item 
+app. \mbox{\hyperlink{_program_8cs_a6435d8beeff4999dc0b0c6d60a86a4e2}{Use\+Authentication}} ()
+\item 
+app. \mbox{\hyperlink{_program_8cs_af6f72d752b2e73aa0292f74bd13237ab}{Use\+Authorization}} ()
+\item 
+await Data\+Base.\+User\+Data\+Base. \mbox{\hyperlink{_program_8cs_a4a84dbe1b3e8bc550942465ce8fd70d5}{Create\+Fire\+Base\+Secure\+Login}} ()
+\item 
+app. \mbox{\hyperlink{_program_8cs_aaa3dbf02e269c3ef7e8546d290c6b3dd}{Run}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+var \mbox{\hyperlink{_program_8cs_a2f78352277081c620fd4cf92a5ce15e5}{builder}} = Web\+Application.\+Create\+Builder(args)
+\item 
+var \mbox{\hyperlink{_program_8cs_a6817d73c17e4f768523a55484f9cdfe3}{jwt\+Settings}} = builder.\+Configuration.\+Get\+Section("{}Jwt\+Settings"{})
+\item 
+var \mbox{\hyperlink{_program_8cs_a7b225fcb720e4d5ed2bbf60e28a25e6d}{app}} = builder.\+Build()
+\item 
+var \mbox{\hyperlink{_program_8cs_a975de72f58dd594a81e392f4ae727359}{environment}} = builder.\+Environment
+\item 
+string \mbox{\hyperlink{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7}{relative\+Path}} = Environment.\+Get\+Environment\+Variable("{}relative\+Path"{})
+\item 
+string \mbox{\hyperlink{_program_8cs_ac08f1152358793fdc1f74ada68cb604f}{full\+Path}} = Path.\+Combine(environment.\+Web\+Root\+Path, \mbox{\hyperlink{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7}{relative\+Path}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_program_8cs_aa55cf0fb58eefec93f7cb32e3ac551e8}\index{Program.cs@{Program.cs}!AddAuthentication@{AddAuthentication}}
+\index{AddAuthentication@{AddAuthentication}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddAuthentication()}{AddAuthentication()}}
+{\footnotesize\ttfamily \label{_program_8cs_aa55cf0fb58eefec93f7cb32e3ac551e8} 
+builder.\+Services. Add\+Authentication (\begin{DoxyParamCaption}\item[{options}]{}{, }\item[{\{ options.\+Default\+Authenticate\+Scheme=Jwt\+Bearer\+Defaults.\+Authentication\+Scheme;options.\+Default\+Challenge\+Scheme=Jwt\+Bearer\+Defaults.\+Authentication\+Scheme;options.\+Default\+Scheme=Jwt\+Bearer\+Defaults.\+Authentication\+Scheme;\}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_ae5ec6d7548eaed13afc397f42272d5a8}\index{Program.cs@{Program.cs}!AddAuthorization@{AddAuthorization}}
+\index{AddAuthorization@{AddAuthorization}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddAuthorization()}{AddAuthorization()}}
+{\footnotesize\ttfamily \label{_program_8cs_ae5ec6d7548eaed13afc397f42272d5a8} 
+builder.\+Services. Add\+Authorization (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_abc3694a0e15618f2499e5a540264f833}\index{Program.cs@{Program.cs}!AddControllers@{AddControllers}}
+\index{AddControllers@{AddControllers}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddControllers()}{AddControllers()}}
+{\footnotesize\ttfamily \label{_program_8cs_abc3694a0e15618f2499e5a540264f833} 
+builder.\+Services. Add\+Controllers (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a2d790ba399ab14c04dcaa036f6457fe9}\index{Program.cs@{Program.cs}!AddCors@{AddCors}}
+\index{AddCors@{AddCors}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddCors()}{AddCors()}}
+{\footnotesize\ttfamily \label{_program_8cs_a2d790ba399ab14c04dcaa036f6457fe9} 
+builder.\+Services. Add\+Cors (\begin{DoxyParamCaption}\item[{options}]{}{, }\item[{\{ options.\+Add\+Policy("{}Allow\+All"{}, \mbox{\hyperlink{_program_8cs_a2f78352277081c620fd4cf92a5ce15e5}{builder}}=$>$ \{ builder.\+Allow\+Any\+Origin() .Allow\+Any\+Method() .Allow\+Any\+Header();\});\}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a0d7859f9cad50e8e9fdf015100780e07}\index{Program.cs@{Program.cs}!AddEndpointsApiExplorer@{AddEndpointsApiExplorer}}
+\index{AddEndpointsApiExplorer@{AddEndpointsApiExplorer}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddEndpointsApiExplorer()}{AddEndpointsApiExplorer()}}
+{\footnotesize\ttfamily \label{_program_8cs_a0d7859f9cad50e8e9fdf015100780e07} 
+builder.\+Services. Add\+Endpoints\+Api\+Explorer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_ad77bab25169a56d2b1b51749467181fc}\index{Program.cs@{Program.cs}!AddOpenTelemetry@{AddOpenTelemetry}}
+\index{AddOpenTelemetry@{AddOpenTelemetry}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddOpenTelemetry()}{AddOpenTelemetry()}}
+{\footnotesize\ttfamily \label{_program_8cs_ad77bab25169a56d2b1b51749467181fc} 
+builder.\+Services. Add\+Open\+Telemetry (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_ae0ce43c019a5621d731d0c622c793644}\index{Program.cs@{Program.cs}!AddSwaggerGen@{AddSwaggerGen}}
+\index{AddSwaggerGen@{AddSwaggerGen}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{AddSwaggerGen()}{AddSwaggerGen()}}
+{\footnotesize\ttfamily \label{_program_8cs_ae0ce43c019a5621d731d0c622c793644} 
+builder.\+Services. Add\+Swagger\+Gen (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a4a84dbe1b3e8bc550942465ce8fd70d5}\index{Program.cs@{Program.cs}!CreateFireBaseSecureLogin@{CreateFireBaseSecureLogin}}
+\index{CreateFireBaseSecureLogin@{CreateFireBaseSecureLogin}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{CreateFireBaseSecureLogin()}{CreateFireBaseSecureLogin()}}
+{\footnotesize\ttfamily \label{_program_8cs_a4a84dbe1b3e8bc550942465ce8fd70d5} 
+await Data\+Base.\+User\+Data\+Base. Create\+Fire\+Base\+Secure\+Login (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a79a944c7f0e25196ca3c5a8638b919b9}\index{Program.cs@{Program.cs}!if@{if}}
+\index{if@{if}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}}
+{\footnotesize\ttfamily \label{_program_8cs_a79a944c7f0e25196ca3c5a8638b919b9} 
+if (\begin{DoxyParamCaption}\item[{app.\+Environment.\+Is\+Development()}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a9e2ee3170aa6279b68eefd1651f7d96c}\index{Program.cs@{Program.cs}!MapControllers@{MapControllers}}
+\index{MapControllers@{MapControllers}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{MapControllers()}{MapControllers()}}
+{\footnotesize\ttfamily \label{_program_8cs_a9e2ee3170aa6279b68eefd1651f7d96c} 
+app. Map\+Controllers (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_aaa3dbf02e269c3ef7e8546d290c6b3dd}\index{Program.cs@{Program.cs}!Run@{Run}}
+\index{Run@{Run}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{Run()}{Run()}}
+{\footnotesize\ttfamily \label{_program_8cs_aaa3dbf02e269c3ef7e8546d290c6b3dd} 
+app. Run (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_afd3c97f58cca79acd37800c271621e1d}\index{Program.cs@{Program.cs}!SetEnvironmentVariable@{SetEnvironmentVariable}}
+\index{SetEnvironmentVariable@{SetEnvironmentVariable}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{SetEnvironmentVariable()}{SetEnvironmentVariable()}}
+{\footnotesize\ttfamily \label{_program_8cs_afd3c97f58cca79acd37800c271621e1d} 
+Environment. Set\+Environment\+Variable (\begin{DoxyParamCaption}\item[{"{}GOOGLE\+\_\+\+APPLICATION\+\_\+\+CREDENTIALS"{}}]{}{, }\item[{\mbox{\hyperlink{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7}{relative\+Path}}}]{}{, }\item[{Environment\+Variable\+Target.}]{Process}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a6435d8beeff4999dc0b0c6d60a86a4e2}\index{Program.cs@{Program.cs}!UseAuthentication@{UseAuthentication}}
+\index{UseAuthentication@{UseAuthentication}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseAuthentication()}{UseAuthentication()}}
+{\footnotesize\ttfamily \label{_program_8cs_a6435d8beeff4999dc0b0c6d60a86a4e2} 
+app. Use\+Authentication (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_af6f72d752b2e73aa0292f74bd13237ab}\index{Program.cs@{Program.cs}!UseAuthorization@{UseAuthorization}}
+\index{UseAuthorization@{UseAuthorization}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseAuthorization()}{UseAuthorization()}}
+{\footnotesize\ttfamily \label{_program_8cs_af6f72d752b2e73aa0292f74bd13237ab} 
+app. Use\+Authorization (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a0a7b080f8fbf578227b41f824d2bcec5}\index{Program.cs@{Program.cs}!UseCors@{UseCors}}
+\index{UseCors@{UseCors}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseCors()}{UseCors()}}
+{\footnotesize\ttfamily \label{_program_8cs_a0a7b080f8fbf578227b41f824d2bcec5} 
+app. Use\+Cors (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a0e2735521aa751e90e009545114aa9c5}\index{Program.cs@{Program.cs}!UseExceptionHandler@{UseExceptionHandler}}
+\index{UseExceptionHandler@{UseExceptionHandler}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseExceptionHandler()}{UseExceptionHandler()}}
+{\footnotesize\ttfamily \label{_program_8cs_a0e2735521aa751e90e009545114aa9c5} 
+app. Use\+Exception\+Handler (\begin{DoxyParamCaption}\item[{error\+App}]{}{, }\item[{\{ \mbox{\hyperlink{_program_8cs_aaa3dbf02e269c3ef7e8546d290c6b3dd}{error\+App.\+Run}}(async context=$>$ \{ var exception\+Handler\+Path\+Feature=context.\+Features.\+Get$<$ IException\+Handler\+Path\+Feature $>$();var exception=exception\+Handler\+Path\+Feature?.Error;await context.\+Response.\+Write\+Async("{}An error occurred."{});\});\}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a256c37e8478a2206072164e132c40b50}\index{Program.cs@{Program.cs}!UseMiddleware$<$ IpRateLimitingMiddleware $>$@{UseMiddleware$<$ IpRateLimitingMiddleware $>$}}
+\index{UseMiddleware$<$ IpRateLimitingMiddleware $>$@{UseMiddleware$<$ IpRateLimitingMiddleware $>$}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseMiddleware$<$ IpRateLimitingMiddleware $>$()}{UseMiddleware< IpRateLimitingMiddleware >()}}
+{\footnotesize\ttfamily \label{_program_8cs_a256c37e8478a2206072164e132c40b50} 
+app. Use\+Middleware$<$ \mbox{\hyperlink{class_ip_rate_limiting_middleware}{Ip\+Rate\+Limiting\+Middleware}} $>$ (\begin{DoxyParamCaption}\item[{50}]{}{, }\item[{Time\+Span.}]{From\+Seconds}{30, }\item[{Time\+Span.}]{From\+Minutes}{3}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a34889d5e8e9690eab4abac71a39812cf}\index{Program.cs@{Program.cs}!UseMiddleware$<$ SecurityHeaderMiddleware $>$@{UseMiddleware$<$ SecurityHeaderMiddleware $>$}}
+\index{UseMiddleware$<$ SecurityHeaderMiddleware $>$@{UseMiddleware$<$ SecurityHeaderMiddleware $>$}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseMiddleware$<$ SecurityHeaderMiddleware $>$()}{UseMiddleware< SecurityHeaderMiddleware >()}}
+{\footnotesize\ttfamily \label{_program_8cs_a34889d5e8e9690eab4abac71a39812cf} 
+app. Use\+Middleware$<$ \mbox{\hyperlink{class_security_header_middleware}{Security\+Header\+Middleware}} $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{_program_8cs_a906a3ce545279a7a73941f1d7b64d7cf}\index{Program.cs@{Program.cs}!UseStaticFiles@{UseStaticFiles}}
+\index{UseStaticFiles@{UseStaticFiles}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{UseStaticFiles()}{UseStaticFiles()}}
+{\footnotesize\ttfamily \label{_program_8cs_a906a3ce545279a7a73941f1d7b64d7cf} 
+app. Use\+Static\+Files (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{_program_8cs_a7b225fcb720e4d5ed2bbf60e28a25e6d}\index{Program.cs@{Program.cs}!app@{app}}
+\index{app@{app}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{app}{app}}
+{\footnotesize\ttfamily \label{_program_8cs_a7b225fcb720e4d5ed2bbf60e28a25e6d} 
+var app = builder.\+Build()}
+
+\Hypertarget{_program_8cs_a2f78352277081c620fd4cf92a5ce15e5}\index{Program.cs@{Program.cs}!builder@{builder}}
+\index{builder@{builder}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{builder}{builder}}
+{\footnotesize\ttfamily \label{_program_8cs_a2f78352277081c620fd4cf92a5ce15e5} 
+var builder = Web\+Application.\+Create\+Builder(args)}
+
+\Hypertarget{_program_8cs_a975de72f58dd594a81e392f4ae727359}\index{Program.cs@{Program.cs}!environment@{environment}}
+\index{environment@{environment}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{environment}{environment}}
+{\footnotesize\ttfamily \label{_program_8cs_a975de72f58dd594a81e392f4ae727359} 
+var environment = builder.\+Environment}
+
+\Hypertarget{_program_8cs_ac08f1152358793fdc1f74ada68cb604f}\index{Program.cs@{Program.cs}!fullPath@{fullPath}}
+\index{fullPath@{fullPath}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{fullPath}{fullPath}}
+{\footnotesize\ttfamily \label{_program_8cs_ac08f1152358793fdc1f74ada68cb604f} 
+string full\+Path = Path.\+Combine(environment.\+Web\+Root\+Path, \mbox{\hyperlink{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7}{relative\+Path}})}
+
+\Hypertarget{_program_8cs_a6817d73c17e4f768523a55484f9cdfe3}\index{Program.cs@{Program.cs}!jwtSettings@{jwtSettings}}
+\index{jwtSettings@{jwtSettings}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{jwtSettings}{jwtSettings}}
+{\footnotesize\ttfamily \label{_program_8cs_a6817d73c17e4f768523a55484f9cdfe3} 
+var jwt\+Settings = builder.\+Configuration.\+Get\+Section("{}Jwt\+Settings"{})}
+
+\Hypertarget{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7}\index{Program.cs@{Program.cs}!relativePath@{relativePath}}
+\index{relativePath@{relativePath}!Program.cs@{Program.cs}}
+\doxysubsubsection{\texorpdfstring{relativePath}{relativePath}}
+{\footnotesize\ttfamily \label{_program_8cs_a7a26adcca22b1ef8b119e1f3acbd69f7} 
+string relative\+Path = Environment.\+Get\+Environment\+Variable("{}relative\+Path"{})}
+

@@ -11,6 +11,11 @@ namespace Logic.UserLogic
 {
     public static class UserLogic
     {
+        /// <summary>
+        /// Registers a new user with the provided registration data.
+        /// </summary>
+        /// <param name="register">The registration data.</param>
+        /// <returns>A <see cref="RegisterResponse"/> containing the registration result.</returns>
         public static async Task<RegisterResponse> RegisterUser(RegisterRequest register)
         {
             try
@@ -41,18 +46,23 @@ namespace Logic.UserLogic
                             return new RegisterResponse();
                         }
                     }
-                    catch (HttpRequestException httpRequestException)
+                    catch (HttpRequestException)
                     {
                         return new RegisterResponse();
                     }
                 }
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 return new RegisterResponse();
             }
         }
 
+        /// <summary>
+        /// Retrieves a token using the provided general request data.
+        /// </summary>
+        /// <param name="register">The general request data.</param>
+        /// <returns>A string containing the token, or an empty string if unsuccessful.</returns>
         public static async Task<string> GetToken(GeneralRequest register)
         {
             try
@@ -80,21 +90,26 @@ namespace Logic.UserLogic
                         }
                         else
                         {
-                            return String.Empty;
+                            return string.Empty;
                         }
                     }
-                    catch (HttpRequestException httpRequestException)
+                    catch (HttpRequestException)
                     {
-                        return String.Empty;
+                        return string.Empty;
                     }
                 }
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return String.Empty;
+                return string.Empty;
             }
         }
 
+        /// <summary>
+        /// Logs in a user with the provided login request data.
+        /// </summary>
+        /// <param name="register">The login request data.</param>
+        /// <returns>A <see cref="Loginresponse"/> containing the login result.</returns>
         public static async Task<Loginresponse> Login(LoginRequest register)
         {
             try
@@ -125,18 +140,32 @@ namespace Logic.UserLogic
                             return new Loginresponse();
                         }
                     }
-                    catch (HttpRequestException httpRequestException)
+                    catch (HttpRequestException)
                     {
                         return new Loginresponse();
                     }
                 }
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 return new Loginresponse();
             }
         }
 
+        /// <summary>
+        /// Retrieves the user configuration based on the provided request data.
+        /// </summary>
+        /// <param name="request">The request data containing necessary details for retrieving the user configuration.</param>
+        /// <returns>
+        /// A <see cref="UserConfiguration"/> object containing the user configuration details.
+        /// Returns a default <see cref="UserConfiguration"/> object if the operation fails.
+        /// </returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if there is an error while sending the HTTP request.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if there is a general exception during the operation.
+        /// </exception>
         public static async Task<UserConfiguration> GetUserConfiguration(GeneralRequest request)
         {
             try
@@ -179,10 +208,25 @@ namespace Logic.UserLogic
             }
         }
 
-        
 
 
-            public static async Task<bool> SendPasswordEmail(GeneralRequest request)
+
+
+        /// <summary>
+        /// Sends a password reset email based on the provided request data.
+        /// </summary>
+        /// <param name="request">The request data containing the necessary details to send the password reset email.</param>
+        /// <returns>
+        /// A <see cref="bool"/> indicating the success of the operation.
+        /// Returns <c>true</c> if the email was sent successfully, otherwise <c>false</c>.
+        /// </returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if there is an error while sending the HTTP request.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if a general exception occurs during the operation.
+        /// </exception>
+        public static async Task<bool> SendPasswordEmail(GeneralRequest request)
         {
             try
             {
@@ -224,6 +268,21 @@ namespace Logic.UserLogic
         }
 
 
+
+        /// <summary>
+        /// Resets the password for a user based on the provided reset password request data.
+        /// </summary>
+        /// <param name="request">The request data containing the details required to reset the password.</param>
+        /// <returns>
+        /// A <see cref="bool"/> indicating the success of the operation.
+        /// Returns <c>true</c> if the password reset was successful, otherwise <c>false</c>.
+        /// </returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if there is an error while sending the HTTP request.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if a general exception occurs during the operation.
+        /// </exception>
         public static async Task<bool> ResetPassword(ResetPasswordRequest request)
         {
             try
@@ -265,6 +324,25 @@ namespace Logic.UserLogic
             }
         }
 
+
+        /// <summary>
+        /// Changes the password for a user based on the provided reset password request data.
+        /// </summary>
+        /// <param name="request">The request data containing the details required to change the password.</param>
+        /// <returns>
+        /// A <see cref="bool"/> indicating whether the password change was successful.
+        /// Returns <c>true</c> if the password was successfully changed, otherwise <c>false</c>.
+        /// </returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if there is an error while sending the HTTP request.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if a general exception occurs during the operation.
+        /// </exception>
+        /// <remarks>
+        /// This method uses a security header and a bearer token for authentication.
+        /// The request data is encrypted before being sent to the server, and the response is decrypted upon receipt.
+        /// </remarks>
         public static async Task<bool> ChangePassword(ResetPasswordRequest request)
         {
             try
@@ -308,6 +386,26 @@ namespace Logic.UserLogic
             }
         }
 
+
+        /// <summary>
+        /// Creates or updates a user configuration based on the provided configuration data.
+        /// </summary>
+        /// <param name="request">The user configuration data that will be sent to the server to create or update the user's configuration.</param>
+        /// <returns>
+        /// A <see cref="bool"/> indicating whether the operation was successful.
+        /// Returns <c>true</c> if the configuration was successfully created or updated, otherwise <c>false</c>.
+        /// </returns>
+        /// <exception cref="HttpRequestException">
+        /// Thrown if there is an error while sending the HTTP request.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if a general exception occurs during the operation.
+        /// </exception>
+        /// <remarks>
+        /// This method sends the user configuration data to the server, where it is encrypted before transmission.
+        /// The server's response is also encrypted, and the data is decrypted upon receipt.
+        /// The method uses a security header and a bearer token for authentication.
+        /// </remarks>
         public static async Task<bool> CreateUserConfiguration(UserConfiguration request)
         {
             try
@@ -350,5 +448,6 @@ namespace Logic.UserLogic
                 return false;
             }
         }
+
     }
 }

@@ -1,0 +1,1046 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>InventoryAPI</name>
+    </assembly>
+    <members>
+        <member name="T:BusinessLogic.AppointmentLogic.AppointmentLogic">
+            <summary>
+            Enthält die Logik für Terminoperationen.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.AppointmentLogic.AppointmentLogic.InsertNewItem(BusinessLogic.Shared.AppointmentRequest)">
+            <summary>
+            Fügt einen neuen Termin in die Datenbank ein.
+            </summary>
+            <param name="request">Das <see cref="T:BusinessLogic.Shared.AppointmentRequest"/>-Objekt mit den Details des neuen Termins.</param>
+            <returns>
+            Ein <see cref="T:System.Boolean"/>-Wert, der angibt, ob die Einfügung erfolgreich war.
+            </returns>
+        </member>
+        <member name="M:BusinessLogic.AppointmentLogic.AppointmentLogic.DeleteItem(BusinessLogic.Shared.AppointmentRequest)">
+            <summary>
+            Löscht einen vorhandenen Termin aus der Datenbank.
+            </summary>
+            <param name="request">Das <see cref="T:BusinessLogic.Shared.AppointmentRequest"/>-Objekt mit den Details des zu löschenden Termins.</param>
+            <returns>
+            Ein <see cref="T:System.Boolean"/>-Wert, der angibt, ob die Löschung erfolgreich war.
+            </returns>
+        </member>
+        <member name="M:BusinessLogic.AppointmentLogic.AppointmentLogic.GetItems(BusinessLogic.Shared.GeneralRequest)">
+            <summary>
+            Ruft eine Liste von Terminen aus der Datenbank ab.
+            </summary>
+            <param name="request">Das <see cref="T:BusinessLogic.Shared.GeneralRequest"/>-Objekt mit allgemeinen Anfragenparametern, wie der Firmen-ID.</param>
+            <returns>
+            Eine Liste von <see cref="T:BusinessLogic.Shared.Appointment"/>, die alle relevanten Termine enthält.
+            </returns>
+        </member>
+        <member name="T:BusinessLogic.Cryption.CryptionMethod">
+            <summary>
+            Enumeration zur Auswahl der Verschlüsselungsmethoden.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Cryption.CryptionLogic">
+            <summary>
+            Bietet Verschlüsselungs- und Entschlüsselungslogik für verschiedene Anwendungen.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.Cryption.CryptionLogic.Encrypt(System.String,BusinessLogic.Cryption.CryptionMethod)">
+            <summary>
+            Verschlüsselt eine Eingabezeichenfolge basierend auf einer ausgewählten Verschlüsselungsmethode.
+            </summary>
+            <param name="input">Die zu verschlüsselnde Zeichenfolge.</param>
+            <param name="key">Die ausgewählte <see cref="T:BusinessLogic.Cryption.CryptionMethod"/>.</param>
+            <returns>Die verschlüsselte Zeichenfolge in Base64-Darstellung.</returns>
+        </member>
+        <member name="M:BusinessLogic.Cryption.CryptionLogic.Decrypt(System.String,BusinessLogic.Cryption.CryptionMethod)">
+            <summary>
+            Entschlüsselt eine verschlüsselte Eingabezeichenfolge basierend auf einer ausgewählten Verschlüsselungsmethode.
+            </summary>
+            <param name="encryptedInput">Die verschlüsselte Zeichenfolge in Base64-Darstellung.</param>
+            <param name="key">Die ausgewählte <see cref="T:BusinessLogic.Cryption.CryptionMethod"/>.</param>
+            <returns>Die entschlüsselte Zeichenfolge.</returns>
+        </member>
+        <member name="M:BusinessLogic.Cryption.CryptionLogic.EncryptConnection(System.String)">
+            <summary>
+            Verschlüsselt eine Verbindungszeichenfolge mit einem festgelegten Schlüssel.
+            </summary>
+            <param name="input">Die zu verschlüsselnde Verbindungszeichenfolge.</param>
+            <returns>Die verschlüsselte Zeichenfolge in Base64-Darstellung.</returns>
+        </member>
+        <member name="M:BusinessLogic.Cryption.CryptionLogic.DecryptConnection(System.String)">
+            <summary>
+            Entschlüsselt eine verschlüsselte Verbindungszeichenfolge mit einem festgelegten Schlüssel.
+            </summary>
+            <param name="encryptedInput">Die verschlüsselte Zeichenfolge in Base64-Darstellung.</param>
+            <returns>Die entschlüsselte Zeichenfolge.</returns>
+        </member>
+        <member name="M:BusinessLogic.Cryption.CryptionLogic.EncryptUserString(System.String)">
+            <summary>
+            Verschlüsselt eine Benutzerzeichenfolge mit AES.
+            </summary>
+            <param name="plaintext">Die zu verschlüsselnde Zeichenfolge.</param>
+            <returns>Die verschlüsselte Zeichenfolge in Base64-Darstellung.</returns>
+        </member>
+        <member name="M:BusinessLogic.Cryption.CryptionLogic.DecryptUserString(System.String)">
+            <summary>
+            Entschlüsselt eine Benutzerzeichenfolge mit AES.
+            </summary>
+            <param name="encrypted">Die verschlüsselte Zeichenfolge in Base64-Darstellung.</param>
+            <returns>Die entschlüsselte Zeichenfolge.</returns>
+        </member>
+        <member name="T:BusinessLogic.Cryption.AesEncryption">
+            <summary>
+            Bietet AES-Verschlüsselungs- und Entschlüsselungslogik.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.Cryption.AesEncryption.Encrypt(System.String,System.Byte[],System.Byte[])">
+            <summary>
+            Verschlüsselt eine Zeichenfolge mit AES.
+            </summary>
+            <param name="plaintext">Die zu verschlüsselnde Zeichenfolge.</param>
+            <param name="key">Der AES-Schlüssel.</param>
+            <param name="iv">Der Initialisierungsvektor (IV) für AES.</param>
+            <returns>Die verschlüsselten Bytes.</returns>
+        </member>
+        <member name="M:BusinessLogic.Cryption.AesEncryption.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Entschlüsselt AES-verschlüsselte Bytes.
+            </summary>
+            <param name="ciphertext">Die verschlüsselten Bytes.</param>
+            <param name="key">Der AES-Schlüssel.</param>
+            <param name="iv">Der Initialisierungsvektor (IV) für AES.</param>
+            <returns>Die entschlüsselte Zeichenfolge.</returns>
+        </member>
+        <member name="T:BusinessLogic.InventoryLogic.InventoryLogic">
+            <summary>
+            Stellt die Geschäftslogik für Inventaroperationen bereit.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.InventoryLogic.InventoryLogic.InsertNewItem(BusinessLogic.Shared.InventoryRequest)">
+            <summary>
+            Fügt einen neuen Inventargegenstand hinzu.
+            </summary>
+            <param name="request">Die Anfrage mit den Informationen des neuen Inventargegenstands.</param>
+            <returns>Gibt true zurück, wenn der Vorgang erfolgreich war, andernfalls false.</returns>
+        </member>
+        <member name="M:BusinessLogic.InventoryLogic.InventoryLogic.GetItems(BusinessLogic.Shared.GeneralRequest)">
+            <summary>
+            Ruft eine Liste von Inventargegenständen ab.
+            </summary>
+            <param name="request">Die Anfrage mit den allgemeinen Parametern wie Unternehmen.</param>
+            <returns>Eine Liste von <see cref="T:BusinessLogic.Shared.InventoryItem"/>, oder eine leere Liste im Fehlerfall.</returns>
+        </member>
+        <member name="T:BusinessLogic.MailLogic.MailLogic">
+            <summary>
+            Stellt die Geschäftslogik für das Versenden von E-Mails bereit.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.MailLogic.MailLogic.SendEmail">
+            <summary>
+            Sendet eine Test-E-Mail an eine vordefinierte Adresse.
+            </summary>
+            <returns>Gibt true zurück, wenn die E-Mail erfolgreich gesendet wurde, andernfalls false.</returns>
+        </member>
+        <member name="T:BusinessLogic.Shared.Appointment">
+            <summary>
+            Repräsentiert einen Termin mit Eigenschaften, die für die Planung und Speicherung benötigt werden.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment.id">
+            <summary>
+            Eindeutige Kennung des Termins.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment.start">
+            <summary>
+            Startzeit des Termins im String-Format.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment.end">
+            <summary>
+            Endzeit des Termins im String-Format.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment.text">
+            <summary>
+            Beschreibung oder Titel des Termins.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment.comment">
+            <summary>
+            Zusätzliche Kommentare oder Anmerkungen zum Termin.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment._start">
+            <summary>
+            Startzeit des Termins als <see cref="T:System.DateTime"/>.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Appointment._end">
+            <summary>
+            Endzeit des Termins als <see cref="T:System.DateTime"/>.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.CryptionElement">
+            <summary>
+            Stellt ein Element für kryptografische Operationen dar.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.CryptionElement.data">
+            <summary>
+            Ruft die Daten ab oder legt sie fest, die verschlüsselt oder entschlüsselt werden sollen.
+            </summary>
+            <remarks>
+            Der Standardwert ist ein leerer String.
+            </remarks>
+        </member>
+        <member name="T:BusinessLogic.Shared.UploadFile">
+            <summary>
+            Repräsentiert eine Datei, die hochgeladen werden soll.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UploadFile.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest, der die Datei hochlädt.
+            </summary>
+            <remarks>
+            Der Standardwert ist ein leerer String.
+            </remarks>
+        </member>
+        <member name="P:BusinessLogic.Shared.UploadFile.fileStream">
+            <summary>
+            Ruft den Datenstrom der Datei ab oder legt ihn fest.
+            </summary>
+            <remarks>
+            Der Standardwert ist ein leeres Array.
+            </remarks>
+        </member>
+        <member name="P:BusinessLogic.Shared.UploadFile.fileName">
+            <summary>
+            Ruft den Namen der Datei ab oder legt ihn fest.
+            </summary>
+            <remarks>
+            Der Standardwert ist ein leerer String.
+            </remarks>
+        </member>
+        <member name="T:BusinessLogic.Shared.DeleteFileRequest">
+            <summary>
+            Repräsentiert eine Anforderung zum Löschen einer Datei.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.DeleteFileRequest.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest, der die Datei löschen möchte.
+            </summary>
+            <remarks>
+            Der Standardwert ist ein leerer String.
+            </remarks>
+        </member>
+        <member name="P:BusinessLogic.Shared.DeleteFileRequest.fileName">
+            <summary>
+            Ruft den Namen der Datei ab oder legt ihn fest, die gelöscht werden soll.
+            </summary>
+            <remarks>
+            Der Standardwert ist ein leerer String.
+            </remarks>
+        </member>
+        <member name="T:BusinessLogic.Shared.InventoryItem">
+            <summary>
+            Represents an inventory item stored in Firestore.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.id">
+            <summary>
+            Unique identifier for the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem._id">
+            <summary>
+            Firestore-specific identifier for the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.name">
+            <summary>
+            Name of the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.category">
+            <summary>
+            Category of the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.insertedFrom">
+            <summary>
+            User who inserted the item into the inventory.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.unit">
+            <summary>
+            Unit of measurement for the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.quantity">
+            <summary>
+            Current quantity of the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.isDeleted">
+            <summary>
+            Indicates whether the item is marked as deleted.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.shouldQuantity">
+            <summary>
+            Desired quantity for the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.singlePrice">
+            <summary>
+            Price per unit of the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.minQuantity">
+            <summary>
+            Minimum quantity threshold for the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem._joinDate">
+            <summary>
+            Firestore-specific join date of the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.joinDate">
+            <summary>
+            Date when the item was added to the inventory.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.active">
+            <summary>
+            Indicates whether the item is active.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.notification">
+            <summary>
+            Indicates whether notifications are enabled for the item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.status">
+            <summary>
+            Status of the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.history">
+            <summary>
+            History of changes for the inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryItem.notifications">
+            <summary>
+            Notifications associated with the inventory item.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.Status">
+            <summary>
+            Enum representing the status of an inventory item.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.Status.Empty">
+            <summary>
+            The item is empty.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.Status.New">
+            <summary>
+            The item is new.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.Status.Reserverd">
+            <summary>
+            The item is reserved.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.Status.Full">
+            <summary>
+            The item is full.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.HistoryItem">
+            <summary>
+            Represents a historical record for an inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem._id">
+            <summary>
+            Firestore-specific identifier for the history item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem.id">
+            <summary>
+            Unique identifier for the history item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem.productId">
+            <summary>
+            Identifier of the associated product.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem._productId">
+            <summary>
+            Firestore-specific identifier for the associated product.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem.insertedFrom">
+            <summary>
+            User who created the history record.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem._date">
+            <summary>
+            Firestore-specific date of the history record.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem.date">
+            <summary>
+            Date of the history record.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.HistoryItem.quantity">
+            <summary>
+            Quantity associated with the history record.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.NotificationItem">
+            <summary>
+            Represents a notification related to an inventory item.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.NotificationItem._id">
+            <summary>
+            Firestore-specific identifier for the notification.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.NotificationItem.id">
+            <summary>
+            Unique identifier for the notification.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.NotificationItem._date">
+            <summary>
+            Firestore-specific date of the notification.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.NotificationItem.date">
+            <summary>
+            Date of the notification.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.NotificationItem.name">
+            <summary>
+            Name of the notification.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.RegisterRequest">
+            <summary>
+            Repräsentiert eine Anfrage zur Registrierung eines Benutzers.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.RegisterRequest.configuration">
+            <summary>
+            Ruft die Konfiguration des Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.RegisterRequest.userId">
+            <summary>
+            Ruft die eindeutige ID des Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.RegisterRequest.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.RegisterRequest.password">
+            <summary>
+            Ruft das Passwort ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.LoginRequest">
+            <summary>
+            Repräsentiert eine Login-Anfrage.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.LoginRequest.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.LoginRequest.password">
+            <summary>
+            Ruft das Passwort ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.GeneralRequest">
+            <summary>
+            Repräsentiert eine allgemeine Anfrage mit Benutzer- und Unternehmensdaten.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.GeneralRequest.userId">
+            <summary>
+            Ruft die Benutzer-ID ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.GeneralRequest.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.GeneralRequest.company">
+            <summary>
+            Ruft den Namen des Unternehmens ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.ResetPasswordRequest">
+            <summary>
+            Repräsentiert eine Anfrage zum Zurücksetzen des Passworts eines Benutzers.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.ResetPasswordRequest.userId">
+            <summary>
+            Ruft die Benutzer-ID ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.ResetPasswordRequest.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.ResetPasswordRequest.password">
+            <summary>
+            Ruft das neue Passwort ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.InventoryRequest">
+            <summary>
+            Repräsentiert eine Anfrage für einen Inventarartikel.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryRequest.item">
+            <summary>
+            Ruft den Inventarartikel ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.InventoryRequest.company">
+            <summary>
+            Ruft den Namen des Unternehmens ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.AppointmentRequest">
+            <summary>
+            Repräsentiert eine Anfrage für einen Termin.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.AppointmentRequest.item">
+            <summary>
+            Ruft den Termin ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.AppointmentRequest.company">
+            <summary>
+            Ruft den Namen des Unternehmens ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.FileRequest">
+            <summary>
+            Repräsentiert eine Datei-Anfrage.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.FileRequest.fileStream">
+            <summary>
+            Ruft den Dateidatenstrom ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.FileRequest.fileName">
+            <summary>
+            Ruft den Namen der Datei ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.FileRequest.company">
+            <summary>
+            Ruft den Namen des Unternehmens ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.ChangePasswordRequest">
+            <summary>
+            Repräsentiert eine Anfrage zum Ändern des Passworts eines Benutzers.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.ChangePasswordRequest.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.ChangePasswordRequest.oldPassword">
+            <summary>
+            Ruft das alte Passwort ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.ChangePasswordRequest.newPassword">
+            <summary>
+            Ruft das neue Passwort ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.ReturnValue">
+            <summary>
+            Gibt den Status eines Vorgangs zurück.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.ReturnValue.Success">
+            <summary>
+            Vorgang war erfolgreich.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.ReturnValue.Warning">
+            <summary>
+            Vorgang führte zu einer Warnung.
+            </summary>
+        </member>
+        <member name="F:BusinessLogic.Shared.ReturnValue.Error">
+            <summary>
+            Vorgang führte zu einem Fehler.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.Loginresponse">
+            <summary>
+            Repräsentiert die Antwort auf eine erfolgreiche Anmeldung.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Loginresponse.userId">
+            <summary>
+            Ruft die eindeutige ID des Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.Loginresponse.jwtToken">
+            <summary>
+            Ruft das generierte JWT-Token für den Benutzer ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.RegisterResponse">
+            <summary>
+            Repräsentiert die Antwort auf eine erfolgreiche Registrierung.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.RegisterResponse.userId">
+            <summary>
+            Ruft die eindeutige ID des registrierten Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.RegisterResponse.jwtToken">
+            <summary>
+            Ruft das generierte JWT-Token für den Benutzer ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.Shared.UserConfiguration">
+            <summary>
+            Repräsentiert die Konfiguration eines Benutzers mit persönlichen und geschäftlichen Informationen.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.id">
+            <summary>
+            Ruft die eindeutige ID des Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.firstName">
+            <summary>
+            Ruft den Vornamen des Benutzers ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.lastName">
+            <summary>
+            Ruft den Nachnamen des Benutzers ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.email">
+            <summary>
+            Ruft die E-Mail-Adresse des Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.userName">
+            <summary>
+            Ruft den Benutzernamen ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.paymentId">
+            <summary>
+            Ruft die Zahlungs-ID des Benutzers ab oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.categories">
+            <summary>
+            Ruft die Kategorien ab, denen der Benutzer zugeordnet ist, oder legt sie fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.company">
+            <summary>
+            Ruft den Namen des Unternehmens des Benutzers ab oder legt ihn fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.paid">
+            <summary>
+            Gibt an, ob der Benutzer bezahlt hat, oder legt diesen Wert fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.joinDate">
+            <summary>
+            Ruft das Beitrittsdatum des Benutzers ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.Shared.UserConfiguration.lastPasswordChange">
+            <summary>
+            Ruft das Datum der letzten Passwortänderung des Benutzers ab oder legt es fest.
+            </summary>
+        </member>
+        <member name="T:BusinessLogic.UserLogic.UserLogic">
+            <summary>
+            Eine Klasse, die die Benutzerverwaltung mit Funktionen zum Abrufen von Konfigurationen, Zurücksetzen von Passwörtern und E-Mail-Benachrichtigungen unterstützt.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.GetUserConfiguration(BusinessLogic.Shared.GeneralRequest)">
+            <summary>
+            Ruft die Benutzerkonfiguration anhand des Benutzernamens und der Benutzer-ID ab.
+            </summary>
+            <param name="request">Ein Objekt, das die Benutzerinformationen enthält.</param>
+            <returns>Die Benutzerkonfiguration für den angegebenen Benutzer.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.ResetPassword(BusinessLogic.Shared.ResetPasswordRequest)">
+            <summary>
+            Setzt das Passwort eines Benutzers zurück, wenn die Benutzerinformationen gültig sind.
+            </summary>
+            <param name="request">Die Anforderungsinformationen zum Zurücksetzen des Passworts.</param>
+            <returns>True, wenn das Passwort erfolgreich zurückgesetzt wurde, andernfalls false.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.SendChangeEmail(BusinessLogic.Shared.GeneralRequest)">
+            <summary>
+            Sendet eine E-Mail zum Ändern des Passworts an den Benutzer.
+            </summary>
+            <param name="request">Die Anfrage mit den Benutzerinformationen.</param>
+            <returns>True, wenn die E-Mail erfolgreich gesendet wurde, andernfalls false.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.GetPasswordChangeEmail(System.String,System.String,System.String,System.String)">
+            <summary>
+            Generiert die HTML-E-Mail-Vorlage für das Zurücksetzen des Passworts.
+            </summary>
+            <param name="userName">Der Benutzername des Empfängers.</param>
+            <param name="passwordResetLink">Der Link zum Zurücksetzen des Passworts.</param>
+            <param name="companyName">Der Name des Unternehmens.</param>
+            <param name="supportLink">Der Link zur Support-Seite.</param>
+            <returns>Die HTML-E-Mail als String.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.GenerateRandomPassword(System.Int32)">
+            <summary>
+            Generiert ein zufälliges Passwort mit der angegebenen Länge.
+            </summary>
+            <param name="length">Die gewünschte Länge des generierten Passworts.</param>
+            <returns>Das generierte Passwort als String.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.SendEmail(System.String,System.Int32,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Sendet eine E-Mail an einen Empfänger.
+            </summary>
+            <param name="smtpServer">Der SMTP-Server, der verwendet wird.</param>
+            <param name="smtpPort">Der Port des SMTP-Servers.</param>
+            <param name="fromEmail">Die Absender-E-Mail-Adresse.</param>
+            <param name="toEmail">Die Empfänger-E-Mail-Adresse.</param>
+            <param name="subject">Der Betreff der E-Mail.</param>
+            <param name="body">Der Body der E-Mail.</param>
+            <param name="smtpUsername">Der Benutzername für den SMTP-Server.</param>
+            <param name="smtpPassword">Das Passwort für den SMTP-Server.</param>
+            <returns>True, wenn die E-Mail erfolgreich gesendet wurde, andernfalls false.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.CreateUserConfiguration(BusinessLogic.Shared.UserConfiguration)">
+            <summary>
+            Erstellt eine neue Benutzerkonfiguration in der Datenbank.
+            </summary>
+            <param name="configuration">Die Konfigurationsdaten des Benutzers.</param>
+            <returns>True, wenn die Konfiguration erfolgreich erstellt wurde, andernfalls false.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.Login(BusinessLogic.Shared.LoginRequest)">
+            <summary>
+            Authentifiziert einen Benutzer anhand von Benutzernamen und Passwort.
+            </summary>
+            <param name="request">Die Login-Anfrage mit Benutzername und Passwort.</param>
+            <returns>Die Benutzer-ID, wenn der Login erfolgreich war, andernfalls eine leere GUID.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.ChangePassword(BusinessLogic.Shared.ChangePasswordRequest)">
+            <summary>
+            Ändert das Passwort eines Benutzers.
+            </summary>
+            <param name="request">Die Anforderung zum Ändern des Passworts.</param>
+            <returns>True, wenn das Passwort erfolgreich geändert wurde, andernfalls false.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.UserLogic.Register(BusinessLogic.Shared.RegisterRequest)">
+            <summary>
+            Registriert einen neuen Benutzer.
+            </summary>
+            <param name="request">Die Anforderung zum Registrieren eines neuen Benutzers.</param>
+            <returns>Eine Antwort, die den Status der Registrierung enthält.</returns>
+        </member>
+        <member name="T:BusinessLogic.UserLogic.LoginAttemptTracker">
+            <summary>
+            Eine Klasse, die Login-Versuche verfolgt und Benutzer bei zu vielen fehlgeschlagenen Versuchen blockiert.
+            </summary>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.LoginAttemptTracker.IsLoginBlocked(System.String)">
+            <summary>
+            Überprüft, ob der Login für einen Benutzer blockiert ist.
+            </summary>
+            <param name="username">Der Benutzername des zu prüfenden Benutzers.</param>
+            <returns>Gibt <c>true</c> zurück, wenn der Login blockiert ist, andernfalls <c>false</c>.</returns>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.LoginAttemptTracker.RegisterFailedAttempt(System.String)">
+            <summary>
+            Registriert einen fehlgeschlagenen Login-Versuch eines Benutzers.
+            </summary>
+            <param name="username">Der Benutzername des Benutzers, für den der fehlgeschlagene Versuch registriert wird.</param>
+        </member>
+        <member name="M:BusinessLogic.UserLogic.LoginAttemptTracker.RegisterSuccessfulLogin(System.String)">
+            <summary>
+            Registriert einen erfolgreichen Login und entfernt blockierte oder fehlgeschlagene Versuche.
+            </summary>
+            <param name="username">Der Benutzername des Benutzers, für den der erfolgreiche Login registriert wird.</param>
+        </member>
+        <member name="T:BusinessLogic.UserLogic.LoginAttemptTracker.LoginAttempt">
+            <summary>
+            Interne Klasse zur Speicherung von Informationen über Login-Versuche eines Benutzers.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.UserLogic.LoginAttemptTracker.LoginAttempt.failedAttempts">
+            <summary>
+            Die Anzahl fehlgeschlagener Login-Versuche.
+            </summary>
+        </member>
+        <member name="P:BusinessLogic.UserLogic.LoginAttemptTracker.LoginAttempt.blockedUntil">
+            <summary>
+            Das Datum und die Uhrzeit, bis zu der der Benutzer blockiert ist.
+            </summary>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.AppointmentController">
+            <summary>
+            Controller für die Verwaltung von Terminen.
+            Alle Endpunkte sind durch Authentifizierung geschützt.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.AppointmentController.InsertNewItem(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Fügt einen neuen Termin ein.
+            </summary>
+            <param name="request">Das verschlüsselte Request-Objekt mit den Termin-Daten.</param>
+            <returns>Das verschlüsselte Antwort-Objekt mit dem Erfolg der Operation.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.AppointmentController.GetItems(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Ruft die bestehenden Termine ab.
+            </summary>
+            <param name="request">Das verschlüsselte Request-Objekt mit den allgemeinen Anfragedaten.</param>
+            <returns>Das verschlüsselte Antwort-Objekt mit der Liste der Termine.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.AppointmentController.DeleteAppointment(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Löscht einen bestehenden Termin.
+            </summary>
+            <param name="request">Das verschlüsselte Request-Objekt mit den zu löschenden Termin-Daten.</param>
+            <returns>Das verschlüsselte Antwort-Objekt mit dem Erfolg der Löschung.</returns>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.HealthController">
+            <summary>
+            Controller zur Überprüfung des Systemstatus.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.HealthController.GetHealth">
+            <summary>
+            Gibt den Gesundheitsstatus des Systems zurück.
+            </summary>
+            <returns>Der String "healthy", der den gesunden Status des Systems anzeigt.</returns>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.InventoryController">
+            <summary>
+            Controller für die Verwaltung von Inventar-Daten.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.InventoryController.InsertNewItem(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Fügt ein neues Inventar-Item hinzu.
+            </summary>
+            <param name="request">Das Inventar-Item als verschlüsselte Anfrage.</param>
+            <returns>Ein verschlüsseltes Antwortobjekt mit dem Ergebnis der Inventar-Hinzufügung.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.InventoryController.GetItems(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Holt die Inventar-Daten.
+            </summary>
+            <param name="request">Die Anfrage mit den Filterkriterien als verschlüsselte Daten.</param>
+            <returns>Ein verschlüsseltes Antwortobjekt mit den abgerufenen Inventar-Daten.</returns>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.MailController">
+            <summary>
+            Controller für das Senden von E-Mails.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.MailController.SendTestMail">
+            <summary>
+            Sendet eine Test-E-Mail.
+            </summary>
+            <returns>True, wenn die E-Mail erfolgreich gesendet wurde, ansonsten false.</returns>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.PaymentController">
+            <summary>
+            Controller für die Zahlungsabwicklung mit Stripe.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.PaymentController.Index">
+            <summary>
+            Verarbeitet Stripe-Zahlungsereignisse und aktualisiert die Benutzerkonfiguration nach Zahlungseingang.
+            </summary>
+            <returns>Ein IActionResult, das den Status der Anfrage angibt (Ok oder BadRequest).</returns>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.UserController">
+            <summary>
+            Controller zur Verwaltung von Benutzeroperationen, einschließlich Registrierung, Login und Konfiguration.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Konstruktor des Controllers, der die Konfiguration injiziert.
+            </summary>
+            <param name="configuration">Die Konfiguration für das API.</param>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.GetToken(System.String,System.Guid)">
+            <summary>
+            Generiert ein JWT-Token für einen Benutzer basierend auf seinem Benutzernamen und seiner ID.
+            </summary>
+            <param name="userName">Der Benutzername des Benutzers.</param>
+            <param name="id">Die ID des Benutzers.</param>
+            <returns>Ein JWT-Token als String.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.Login(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Authentifiziert einen Benutzer und gibt ein JWT-Token zurück.
+            </summary>
+            <param name="request">Das verschlüsselte Login-Request-Objekt.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit der Benutzer-ID und dem JWT-Token.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.GetUserConfiguration(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Gibt die Benutzerkonfiguration für einen authentifizierten Benutzer zurück.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit Benutzerinformationen.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit der Benutzerkonfiguration.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.ChangePassword(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Ändert das Passwort eines Benutzers.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit den neuen Passwortinformationen.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit dem Erfolg der Passwortänderung.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.CreateUserConfiguration(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Erstellt die Benutzerkonfiguration für einen neuen Benutzer.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit den Benutzerkonfigurationsdaten.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit dem Erfolg der Erstellung der Benutzerkonfiguration.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.ResetPassword(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Setzt das Passwort eines Benutzers zurück.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit den Rücksetzungsdaten.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit dem Erfolg der Passwortzurücksetzung.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.SendPasswordEmail(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Sendet eine E-Mail zum Zurücksetzen des Passworts.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit den Benutzerinformationen.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit dem Erfolg des E-Mail-Versands.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.GetToken(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Holt das Token für einen Benutzer basierend auf den übermittelten Daten.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit den Benutzerinformationen.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit dem JWT-Token.</returns>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.UserController.Register(BusinessLogic.Shared.CryptionElement)">
+            <summary>
+            Registriert einen neuen Benutzer und gibt ein JWT-Token zurück.
+            </summary>
+            <param name="data">Das verschlüsselte Request-Objekt mit den Registrierungsdaten.</param>
+            <returns>Ein verschlüsseltes Response-Objekt mit der Benutzer-ID und dem JWT-Token.</returns>
+        </member>
+        <member name="T:ShiftMuveApi.Controllers.VersionController">
+            <summary>
+            Controller zur Verwaltung der Versionsinformationen der API.
+            </summary>
+        </member>
+        <member name="M:ShiftMuveApi.Controllers.VersionController.GetVersion">
+            <summary>
+            Gibt die aktuelle Version der API zurück.
+            </summary>
+            <returns>Die Version als String.</returns>
+        </member>
+        <member name="T:DataBase.AppointmentDatabase">
+            <summary>
+            Diese Klasse verwaltet die Interaktionen mit der Firebase Firestore-Datenbank und speichert sowie abruft Termine.
+            </summary>
+        </member>
+        <member name="M:DataBase.AppointmentDatabase.InsertNew(BusinessLogic.Shared.AppointmentRequest)">
+            <summary>
+            Fügt einen neuen Termin in die Firestore-Datenbank ein.
+            </summary>
+            <param name="request">Die Anfrage mit den Details des Termins.</param>
+            <returns>True, wenn der Termin erfolgreich eingefügt wurde, andernfalls False.</returns>
+        </member>
+        <member name="M:DataBase.AppointmentDatabase.DeleteAppointment(BusinessLogic.Shared.AppointmentRequest)">
+            <summary>
+            Löscht einen Termin aus der Firestore-Datenbank.
+            </summary>
+            <param name="request">Die Anfrage mit den Details des zu löschenden Termins.</param>
+            <returns>True, wenn der Termin erfolgreich gelöscht wurde, andernfalls False.</returns>
+        </member>
+        <member name="M:DataBase.AppointmentDatabase.GetAppointment(System.String)">
+            <summary>
+            Ruft alle Termine eines Unternehmens aus der Firestore-Datenbank ab.
+            </summary>
+            <param name="company">Der Name des Unternehmens, dessen Termine abgerufen werden sollen.</param>
+            <returns>Eine Liste von Terminen für das angegebene Unternehmen.</returns>
+        </member>
+        <member name="T:DataBase.InventoryDataBase">
+            <summary>
+            Diese Klasse verwaltet die Interaktionen mit der Firebase Firestore-Datenbank und ermöglicht das Hinzufügen, Abrufen und Hochladen von Inventarobjekten.
+            </summary>
+        </member>
+        <member name="M:DataBase.InventoryDataBase.InsertNewInventory(BusinessLogic.Shared.InventoryRequest)">
+            <summary>
+            Fügt ein neues Inventarobjekt in die Firestore-Datenbank ein.
+            </summary>
+            <param name="request">Die Anfrage mit den Inventardaten.</param> 
+            <returns>True, wenn das Inventar erfolgreich eingefügt wurde, andernfalls False.</returns>
+        </member>
+        <member name="M:DataBase.InventoryDataBase.GetInventory(System.String)">
+            <summary>
+            Ruft alle Inventarobjekte eines Unternehmens aus der Firestore-Datenbank ab.
+            </summary>
+            <param name="company">Der Name des Unternehmens, dessen Inventar abgerufen werden soll.</param>
+            <returns>Eine Liste von Inventarobjekten für das angegebene Unternehmen.</returns>
+        </member>
+        <member name="M:DataBase.InventoryDataBase.UploadInventoryPicture(BusinessLogic.Shared.FileRequest)">
+            <summary>
+            Lädt ein Bild eines Inventarobjekts in Firebase Storage hoch.
+            </summary>
+            <param name="request">Die Anfrage mit den Bilddaten des Inventars.</param>
+            <returns>Die URL des hochgeladenen Bildes, falls erfolgreich, andernfalls eine leere Zeichenkette.</returns>
+        </member>
+    </members>
+</doc>
