@@ -70,46 +70,6 @@ namespace Logic.Cryption
             }
         }
 
-        //public static string EncryptConnection(string input)
-        //{
-
-        //    if (String.IsNullOrEmpty(input)) return String.Empty;
-        //    else
-        //    {
-        //        byte[] inputBytes = Encoding.UTF32.GetBytes(input);
-        //        byte[] keyBytes = Encoding.UTF32.GetBytes(clientConnectionKey);
-
-        //        byte[] encryptedBytes = new byte[inputBytes.Length];
-
-        //        for (int i = 0; i < inputBytes.Length; i++)
-        //        {
-        //            encryptedBytes[i] = (byte)(inputBytes[i] ^ keyBytes[i % keyBytes.Length]);
-        //        }
-        //        return Convert.ToBase64String(encryptedBytes);
-        //    }
-
-        //}
-
-        //public static string DecryptConnection(string encryptedInput)
-        //{
-
-        //    if (String.IsNullOrEmpty(encryptedInput)) return String.Empty;
-        //    else
-        //    {
-        //        byte[] encryptedBytes = Convert.FromBase64String(encryptedInput);
-        //        byte[] keyBytes = Encoding.UTF32.GetBytes(clientConnectionKey);
-
-        //        byte[] decryptedBytes = new byte[encryptedBytes.Length];
-
-        //        for (int i = 0; i < encryptedBytes.Length; i++)
-        //        {
-        //            decryptedBytes[i] = (byte)(encryptedBytes[i] ^ keyBytes[i % keyBytes.Length]);
-        //        }
-
-        //        return Encoding.UTF32.GetString(decryptedBytes);
-        //    }
-
-        //}
 
         public static (string, string) CreateSecurityHeader()
         {
