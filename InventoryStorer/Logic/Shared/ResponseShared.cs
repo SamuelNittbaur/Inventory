@@ -7,13 +7,13 @@
         Error
     }
 
-    public class Loginresponse
+    public record class Loginresponse
     {
         public Guid userId { get; set; } = Guid.Empty;
         public string jwtToken { get; set; } = String.Empty;
     }
 
-    public class RegisterResponse
+    public record class RegisterResponse
     {
         public Guid userId { get; set; } = Guid.Empty;
         public string jwtToken { get; set; } = String.Empty;

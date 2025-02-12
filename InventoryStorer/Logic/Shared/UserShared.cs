@@ -1,6 +1,6 @@
 ﻿namespace Logic.Shared
 {
-    public class UserConfiguration
+    public record class UserConfiguration
     {
         public Guid id { get; set; } = Guid.Empty;
         public string firstName { get; set; } = String.Empty;

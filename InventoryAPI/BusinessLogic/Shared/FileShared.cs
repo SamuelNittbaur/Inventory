@@ -3,7 +3,7 @@
     /// <summary>
     /// Repräsentiert eine Datei, die hochgeladen werden soll.
     /// </summary>
-    public class UploadFile
+    public record class UploadFile
     {
         /// <summary>
         /// Ruft den Benutzernamen ab oder legt ihn fest, der die Datei hochlädt.
@@ -33,7 +33,7 @@
     /// <summary>
     /// Repräsentiert eine Anforderung zum Löschen einer Datei.
     /// </summary>
-    public class DeleteFileRequest
+    public record class DeleteFileRequest
     {
         /// <summary>
         /// Ruft den Benutzernamen ab oder legt ihn fest, der die Datei löschen möchte.

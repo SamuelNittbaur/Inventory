@@ -1,8 +1,6 @@
-﻿using Logic.Shared;
-
-namespace Logic.Shared
+﻿namespace Logic.Shared
 {
-    public class RegisterRequest
+    public record class RegisterRequest
     {
         public UserConfiguration configuration { get; set; } = new UserConfiguration();
         public Guid userId { get; set; } = Guid.Empty;
@@ -10,31 +8,31 @@ namespace Logic.Shared
         public String password { get; set; } = String.Empty;
     }
 
-    public class LoginRequest
+    public record class LoginRequest
     {
         public String userName { get; set; } = String.Empty;
         public String password { get; set; } = String.Empty;
     }
 
-    public class GeneralRequest
+    public record class GeneralRequest
     {
         public Guid userId { get; set; } = Guid.Empty;
         public String userName { get; set; } = String.Empty;
         public String company { get; set; } = String.Empty;
     }
 
-   
 
-    public class FileRequest
+
+    public record class FileRequest
     {
         public byte[] fileStream { get; set; } = new byte[0];
         public string fileName { get; set; } = String.Empty;
         public string company { get; set; } = String.Empty;
     }
 
-   
-    
-    public class ChangePasswordRequest
+
+
+    public record class ChangePasswordRequest
     {
         public string userName { get; set; } = String.Empty;
         public string oldPassword { get; set; } = String.Empty;
@@ -42,18 +40,18 @@ namespace Logic.Shared
 
     }
 
-    public class InventoryRequest
+    public record class InventoryRequest
     {
         public InventoryItem item { get; set; } = new InventoryItem();
         public String company { get; set; } = String.Empty;
     }
 
-    public class AppointmentRequest
+    public record class AppointmentRequest
     {
         public Appointment item { get; set; } = new Appointment();
         public String company { get; set; } = String.Empty;
     }
-    public class ResetPasswordRequest
+    public record class ResetPasswordRequest
     {
         public Guid userId { get; set; } = Guid.Empty;
         public String userName { get; set; } = String.Empty;

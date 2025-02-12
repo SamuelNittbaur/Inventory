@@ -3,7 +3,7 @@
     /// <summary>
     /// Repräsentiert die Konfiguration eines Benutzers mit persönlichen und geschäftlichen Informationen.
     /// </summary>
-    public class UserConfiguration
+    public record class UserConfiguration
     {
         /// <summary>
         /// Ruft die eindeutige ID des Benutzers ab oder legt sie fest.

@@ -1,6 +1,6 @@
 ﻿namespace Logic.Shared
 {
-    public class InventoryItem
+    public record class InventoryItem
     {
         public Guid id { get; set; } = Guid.Empty;
         public string name { get; set; } = String.Empty;
@@ -30,7 +30,7 @@
         Full
     }
 
-    public class HistoryItem
+    public record class HistoryItem
     {
         public Guid id { get; set; } = Guid.Empty;
         public Guid productId { get; set; } = Guid.Empty;
@@ -39,7 +39,7 @@
         public double quantity { get; set; } = 0;
     }
 
-    public class NotificationItem
+    public record class NotificationItem
     {
         public Guid id { get; set; } = Guid.Empty;
         public DateTime date { get; set; } = DateTime.MinValue;

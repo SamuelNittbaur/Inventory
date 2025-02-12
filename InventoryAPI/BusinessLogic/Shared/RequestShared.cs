@@ -3,7 +3,7 @@
     /// <summary>
     /// Repräsentiert eine Anfrage zur Registrierung eines Benutzers.
     /// </summary>
-    public class RegisterRequest
+    public record class RegisterRequest
     {
         /// <summary>
         /// Ruft die Konfiguration des Benutzers ab oder legt sie fest.
@@ -29,7 +29,7 @@
     /// <summary>
     /// Repräsentiert eine Login-Anfrage.
     /// </summary>
-    public class LoginRequest
+    public record class LoginRequest
     {
         /// <summary>
         /// Ruft den Benutzernamen ab oder legt ihn fest.
@@ -45,7 +45,7 @@
     /// <summary>
     /// Repräsentiert eine allgemeine Anfrage mit Benutzer- und Unternehmensdaten.
     /// </summary>
-    public class GeneralRequest
+    public record class GeneralRequest
     {
         /// <summary>
         /// Ruft die Benutzer-ID ab oder legt sie fest.
@@ -66,7 +66,7 @@
     /// <summary>
     /// Repräsentiert eine Anfrage zum Zurücksetzen des Passworts eines Benutzers.
     /// </summary>
-    public class ResetPasswordRequest
+    public record class ResetPasswordRequest
     {
         /// <summary>
         /// Ruft die Benutzer-ID ab oder legt sie fest.
@@ -87,7 +87,7 @@
     /// <summary>
     /// Repräsentiert eine Anfrage für einen Inventarartikel.
     /// </summary>
-    public class InventoryRequest
+    public record class InventoryRequest
     {
         /// <summary>
         /// Ruft den Inventarartikel ab oder legt ihn fest.
@@ -103,7 +103,7 @@
     /// <summary>
     /// Repräsentiert eine Anfrage für einen Termin.
     /// </summary>
-    public class AppointmentRequest
+    public record class AppointmentRequest
     {
         /// <summary>
         /// Ruft den Termin ab oder legt ihn fest.
@@ -119,7 +119,7 @@
     /// <summary>
     /// Repräsentiert eine Datei-Anfrage.
     /// </summary>
-    public class FileRequest
+    public record class FileRequest
     {
         /// <summary>
         /// Ruft den Dateidatenstrom ab oder legt ihn fest.
@@ -140,7 +140,7 @@
     /// <summary>
     /// Repräsentiert eine Anfrage zum Ändern des Passworts eines Benutzers.
     /// </summary>
-    public class ChangePasswordRequest
+    public record class ChangePasswordRequest
     {
         /// <summary>
         /// Ruft den Benutzernamen ab oder legt ihn fest.

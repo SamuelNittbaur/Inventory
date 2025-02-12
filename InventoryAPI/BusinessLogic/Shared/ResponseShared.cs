@@ -24,7 +24,7 @@
     /// <summary>
     /// Repräsentiert die Antwort auf eine erfolgreiche Anmeldung.
     /// </summary>
-    public class Loginresponse
+    public record class Loginresponse
     {
         /// <summary>
         /// Ruft die eindeutige ID des Benutzers ab oder legt sie fest.
@@ -40,7 +40,7 @@
     /// <summary>
     /// Repräsentiert die Antwort auf eine erfolgreiche Registrierung.
     /// </summary>
-    public class RegisterResponse
+    public record class RegisterResponse
     {
         /// <summary>
         /// Ruft die eindeutige ID des registrierten Benutzers ab oder legt sie fest.

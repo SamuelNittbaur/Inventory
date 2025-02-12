@@ -6,7 +6,7 @@ namespace BusinessLogic.Shared
     /// Represents an inventory item stored in Firestore.
     /// </summary>
     [FirestoreData]
-    public class InventoryItem
+    public record class InventoryItem
     {
         /// <summary>
         /// Unique identifier for the inventory item.

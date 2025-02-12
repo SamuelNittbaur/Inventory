@@ -6,7 +6,7 @@ namespace BusinessLogic.Shared
     /// Repräsentiert einen Termin mit Eigenschaften, die für die Planung und Speicherung benötigt werden.
     /// </summary>
     [FirestoreData]
-    public class Appointment
+    public record class Appointment
     {
         /// <summary>
         /// Eindeutige Kennung des Termins.
